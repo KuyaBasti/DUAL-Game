@@ -1,0 +1,227 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1700" width="1000" height="1700" role="img" aria-label="DUAL end-to-end flowchart: player inputs feed the interrupt layer (SysTick, TimerA0 and GPIO ISRs), which shares volatile globals with the three main.c screens (username, round loop, WIN/LOSE); the screens swap READY, 11-byte packets, QUIT and r/h votes with the other CC3200 over UART1, draw through Adafruit_GFX and the SSD1351 driver, and POST over one TLS socket to an AWS IoT device shadow, which an AWS IoT Rule HTTP action (not in this repo) relays to a Flask server">
+  <style>
+    .bg{fill:#ffffff}
+    .title{fill:#1f2328;font:600 22px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .sub{fill:#59636e;font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .lbl{fill:#1f2328;font:600 14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .note{fill:#59636e;font:12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .glbl{fill:#59636e;font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;letter-spacing:.06em}
+    .elbl{fill:#59636e;font:11px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .edge{stroke:#818b98;stroke-width:1.6;fill:none}
+    .edge-dash{stroke:#818b98;stroke-width:1.6;fill:none;stroke-dasharray:6 4}
+    .arrow{fill:#818b98}
+    .group{fill:none;stroke:#d1d9e0;stroke-width:1.2;stroke-dasharray:4 4}
+    .b-blue{fill:#ddf4ff;stroke:#54aeff;stroke-width:1.5}
+    .b-green{fill:#dafbe1;stroke:#4ac26b;stroke-width:1.5}
+    .b-purple{fill:#fbefff;stroke:#c297ff;stroke-width:1.5}
+    .b-orange{fill:#fff1e5;stroke:#fb8f44;stroke-width:1.5}
+    .b-gray{fill:#f6f8fa;stroke:#d1d9e0;stroke-width:1.5}
+    .b-red{fill:#ffebe9;stroke:#ff8182;stroke-width:1.5}
+    .b-planned{fill:#f6f8fa;stroke:#818b98;stroke-width:1.5;stroke-dasharray:5 4}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#0d1117}
+      .title,.lbl{fill:#e6edf3}
+      .sub,.note,.glbl,.elbl{fill:#9198a1}
+      .edge,.edge-dash{stroke:#9198a1}
+      .arrow{fill:#9198a1}
+      .group{stroke:#3d444d}
+      .b-blue{fill:#0c2d6b;stroke:#4493f8}
+      .b-green{fill:#0f3b1e;stroke:#3fb950}
+      .b-purple{fill:#2e1a4f;stroke:#ab7df8}
+      .b-orange{fill:#3d1f0a;stroke:#f0883e}
+      .b-gray{fill:#151b23;stroke:#3d444d}
+      .b-red{fill:#3c1618;stroke:#f85149}
+      .b-planned{fill:#151b23;stroke:#9198a1}
+    }
+  </style>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="arrow" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1000" height="1700" rx="12"/>
+  <text class="title" x="32" y="48">DUAL — end-to-end flowchart</text>
+  <text class="sub" x="32" y="74">Time comes from two 40 ms timer interrupts, the game loop free-runs, and only events cross the board link.</text>
+
+  <!-- ===== Player inputs ===== -->
+  <rect class="group" x="274" y="93" width="702" height="127" rx="12"/>
+  <text class="glbl" x="290" y="115">PLAYER INPUTS</text>
+  <rect class="b-orange" x="290" y="128" width="200" height="76" rx="10"/>
+  <text class="lbl" x="390" y="152" text-anchor="middle">IR remote</text>
+  <text class="note" x="390" y="171" text-anchor="middle">→ receiver on PIN_61</text>
+  <text class="note" x="390" y="190" text-anchor="middle">12-bit codes from pulse widths</text>
+  <rect class="b-orange" x="508" y="128" width="184" height="76" rx="10"/>
+  <text class="lbl" x="600" y="161.5" text-anchor="middle">SW3 — PIN_04</text>
+  <text class="note" x="600" y="180.5" text-anchor="middle">hold = charge, release = fire</text>
+  <rect class="b-orange" x="710" y="128" width="250" height="76" rx="10"/>
+  <text class="lbl" x="835" y="152" text-anchor="middle">on-board accelerometer</text>
+  <text class="note" x="835" y="171" text-anchor="middle">I2C 0x18 · burst-reads regs 0x02–0x05</text>
+  <text class="note" x="835" y="190" text-anchor="middle">keeps 0x05 → x, 0x03 → y · 400 kHz</text>
+
+  <!-- ===== Interrupt layer ===== -->
+  <rect class="group" x="24" y="248" width="952" height="150" rx="12"/>
+  <text class="glbl" x="40" y="270">INTERRUPT LAYER — SysTick + TimerA0 every 40 ms</text>
+  <text class="glbl" x="40" y="286">(3,200,000 ticks @ 80 MHz) + edge-triggered GPIO ISRs</text>
+  <rect class="b-green" x="40" y="304" width="260" height="76" rx="10"/>
+  <text class="lbl" x="170" y="328" text-anchor="middle">SysTick ISR</text>
+  <text class="note" x="170" y="347" text-anchor="middle">global_time += 40</text>
+  <text class="note" x="170" y="366" text-anchor="middle">its counter = the IR mark stopwatch</text>
+  <rect class="b-green" x="440" y="304" width="210" height="76" rx="10"/>
+  <text class="lbl" x="545" y="328" text-anchor="middle">GPIO ISRs</text>
+  <text class="note" x="545" y="347" text-anchor="middle">PIN_61 both edges — IR decode</text>
+  <text class="note" x="545" y="366" text-anchor="middle">PIN_04 falling — fire flag</text>
+  <rect class="b-green" x="690" y="304" width="190" height="76" rx="10"/>
+  <text class="lbl" x="785" y="328" text-anchor="middle">TimerA0 ISR</text>
+  <text class="note" x="785" y="347" text-anchor="middle">charge every 600 ms held,</text>
+  <text class="note" x="785" y="366" text-anchor="middle">+1 every ~1.04 s if SW3 up</text>
+
+  <!-- ===== inputs -> ISRs; GPIO ISR drives the SysTick counter as a stopwatch ===== -->
+  <path class="edge" d="M465,204 V300" marker-end="url(#ah)"/>
+  <path class="edge" d="M600,204 V300" marker-end="url(#ah)"/>
+  <path class="edge" d="M680,204 V232 H730 V300" marker-end="url(#ah)"/>
+  <path class="edge-dash" d="M440,360 H304" marker-end="url(#ah)"/>
+  <text class="elbl" x="370" y="332" text-anchor="middle">zeroes / reads its</text>
+  <text class="elbl" x="370" y="346" text-anchor="middle">counter (IR timing)</text>
+
+  <!-- ===== main.c game loop ===== -->
+  <rect class="group" x="24" y="418" width="916" height="500" rx="12"/>
+  <text class="glbl" x="40" y="439">main.c — FREE-RUNNING</text>
+  <text class="glbl" x="40" y="455">GAME LOOP</text>
+  <rect class="b-blue" x="60" y="560" width="200" height="76" rx="10"/>
+  <text class="lbl" x="160" y="593.5" text-anchor="middle">username screen</text>
+  <text class="note" x="160" y="612.5" text-anchor="middle">multi-tap keypad over IR</text>
+  <rect class="b-blue" x="580" y="560" width="280" height="76" rx="10"/>
+  <text class="lbl" x="720" y="584" text-anchor="middle">round loop</text>
+  <text class="note" x="720" y="603" text-anchor="middle">move ship, fire, step 6 + 6 shot slots,</text>
+  <text class="note" x="720" y="622" text-anchor="middle">collide, erase-redraw</text>
+  <rect class="b-blue" x="560" y="800" width="240" height="80" rx="10"/>
+  <text class="lbl" x="680" y="835.5" text-anchor="middle">WIN / LOSE screen</text>
+  <text class="note" x="680" y="854.5" text-anchor="middle">IR menu → 'r' / 'h' vote</text>
+
+  <!-- ===== ISRs -> screens (volatile globals, dashed) ===== -->
+  <path class="edge-dash" d="M235,380 V556" marker-end="url(#ah)"/>
+  <text class="elbl" x="225" y="503" text-anchor="end">global_time —</text>
+  <text class="elbl" x="225" y="517" text-anchor="end">blink + multi-tap windows</text>
+  <path class="edge-dash" d="M285,380 V830 H556" marker-end="url(#ah)"/>
+  <text class="elbl" x="300" y="817">global_time — 400 ms blink</text>
+  <path class="edge-dash" d="M500,380 V574 H264" marker-end="url(#ah)"/>
+  <text class="elbl" x="490" y="546" text-anchor="end">data + pin_out_intflag</text>
+  <text class="elbl" x="490" y="560" text-anchor="end">(IR code ready)</text>
+  <path class="edge-dash" d="M530,380 V810 H556" marker-end="url(#ah)"/>
+  <text class="elbl" x="520" y="786" text-anchor="end">data (read directly)</text>
+  <path class="edge-dash" d="M610,380 V556" marker-end="url(#ah)"/>
+  <text class="elbl" x="620" y="448">switch_intflag</text>
+  <text class="elbl" x="620" y="462">(SW3 release)</text>
+  <path class="edge-dash" d="M750,380 V556" marker-end="url(#ah)"/>
+  <text class="elbl" x="760" y="448">ammo_cnt / projectile_scale</text>
+  <text class="elbl" x="760" y="462">/ projectile_size</text>
+
+  <!-- ===== accelerometer, polled over I2C by the round loop ===== -->
+  <path class="edge" d="M918,204 V590 H864" marker-end="url(#ah)"/>
+  <text class="elbl" x="908" y="516" text-anchor="end">polled every pass:</text>
+  <text class="elbl" x="908" y="530" text-anchor="end">ReadAccData() over I2C</text>
+
+  <!-- ===== control flow between screens (solid) ===== -->
+  <path class="edge" d="M260,600 H576" marker-end="url(#ah)"/>
+  <text class="elbl" x="408" y="622" text-anchor="middle">after READY swap</text>
+  <path class="edge" d="M700,560 V536 H660 V556" marker-end="url(#ah)"/>
+  <text class="elbl" x="680" y="508" text-anchor="middle">scores &lt; 5 →</text>
+  <text class="elbl" x="680" y="522" text-anchor="middle">next round</text>
+  <path class="edge" d="M780,636 V796" marker-end="url(#ah)"/>
+  <text class="elbl" x="770" y="756" text-anchor="end">a score reaches 5</text>
+  <path class="edge" d="M620,800 V640" marker-end="url(#ah)"/>
+  <text class="elbl" x="630" y="692">rematch: both sent 'r'</text>
+  <text class="elbl" x="630" y="706">· scores reset</text>
+  <path class="edge" d="M560,866 H200 V640" marker-end="url(#ah)"/>
+  <text class="elbl" x="220" y="852">home: either sent 'h'</text>
+
+  <!-- ===== Board link ===== -->
+  <rect class="group" x="600" y="940" width="350" height="290" rx="12"/>
+  <text class="glbl" x="616" y="1214">BOARD LINK — UART1, 115200 8N1, CROSSOVER</text>
+  <rect class="b-red" x="620" y="996" width="260" height="76" rx="10"/>
+  <text class="lbl" x="750" y="1029.5" text-anchor="middle">11-byte projectile packets</text>
+  <text class="note" x="750" y="1048.5" text-anchor="middle">+ READY / QUIT / 'r' / 'h'</text>
+  <rect class="b-red" x="620" y="1122" width="260" height="66" rx="10"/>
+  <text class="lbl" x="750" y="1150.5" text-anchor="middle">the other CC3200</text>
+  <text class="note" x="750" y="1169.5" text-anchor="middle">x → 128 − x, v → −v</text>
+  <path class="edge" d="M750,1076 V1118" marker-start="url(#ah)" marker-end="url(#ah)"/>
+  <path class="edge" d="M830,640 V992" marker-start="url(#ah)" marker-end="url(#ah)"/>
+  <text class="elbl" x="840" y="720">11-byte packets</text>
+  <text class="elbl" x="840" y="734">+ QUIT</text>
+  <path class="edge" d="M700,884 V992" marker-start="url(#ah)" marker-end="url(#ah)"/>
+  <text class="elbl" x="690" y="960" text-anchor="end">'r' / 'h' vote</text>
+  <path class="edge" d="M110,640 V898 H540 V1034 H616" marker-start="url(#ah)" marker-end="url(#ah)"/>
+  <text class="elbl" x="126" y="885">READY swap</text>
+
+  <!-- ===== Display path (bundled edges from the main.c boundary) ===== -->
+  <rect class="group" x="120" y="986" width="370" height="316" rx="12"/>
+  <text class="glbl" x="136" y="1007">DISPLAY PATH</text>
+  <rect class="b-purple" x="150" y="1022" width="250" height="66" rx="10"/>
+  <text class="lbl" x="275" y="1050.5" text-anchor="middle">Adafruit_GFX primitives</text>
+  <text class="note" x="275" y="1069.5" text-anchor="middle">scaled chars become driver fillRects</text>
+  <rect class="b-purple" x="150" y="1118" width="250" height="76" rx="10"/>
+  <text class="lbl" x="275" y="1142" text-anchor="middle">Adafruit_OLED.c</text>
+  <text class="note" x="275" y="1161" text-anchor="middle">SSD1351 driver · fillRect/fillScreen</text>
+  <text class="note" x="275" y="1180" text-anchor="middle">per-byte SPI + DC/CS GPIO</text>
+  <rect class="b-purple" x="150" y="1224" width="250" height="66" rx="10"/>
+  <text class="lbl" x="275" y="1252.5" text-anchor="middle">SSD1351 OLED 128×128</text>
+  <text class="note" x="275" y="1271.5" text-anchor="middle">SPI 100 kHz, RGB565</text>
+  <path class="edge" d="M300,918 V1018" marker-end="url(#ah)"/>
+  <text class="elbl" x="290" y="944" text-anchor="end">circles, triangles,</text>
+  <text class="elbl" x="290" y="958" text-anchor="end">round-rects, 5×7 chars</text>
+  <path class="edge" d="M460,918 V1156 H404" marker-end="url(#ah)"/>
+  <text class="elbl" x="450" y="944" text-anchor="end">fillRect /</text>
+  <text class="elbl" x="450" y="958" text-anchor="end">fillScreen</text>
+  <path class="edge" d="M275,1088 V1114" marker-end="url(#ah)"/>
+  <path class="edge" d="M275,1194 V1220" marker-end="url(#ah)"/>
+
+  <!-- ===== Score pipeline ===== -->
+  <rect class="group" x="24" y="1338" width="952" height="236" rx="12"/>
+  <text class="glbl" x="96" y="1359">SCORE PIPELINE</text>
+  <rect class="b-gray" x="40" y="1374" width="272" height="76" rx="10"/>
+  <text class="lbl" x="176" y="1398" text-anchor="middle">SimpleLink TLS socket</text>
+  <text class="note" x="176" y="1417" text-anchor="middle">52.88.252.80:8443 · hand-built HTTP POST</text>
+  <text class="note" x="176" y="1436" text-anchor="middle">opened once at boot, reused</text>
+  <rect class="b-gray" x="40" y="1492" width="200" height="66" rx="10"/>
+  <text class="lbl" x="140" y="1520.5" text-anchor="middle">AWS IoT device shadow</text>
+  <text class="note" x="140" y="1539.5" text-anchor="middle">body: state.desired.default</text>
+  <rect class="b-planned" x="290" y="1492" width="200" height="66" rx="10"/>
+  <text class="lbl" x="390" y="1520.5" text-anchor="middle">AWS IoT Rule</text>
+  <text class="note" x="390" y="1539.5" text-anchor="middle">HTTP action · not in this repo</text>
+  <rect class="b-gray" x="540" y="1482" width="270" height="76" rx="10"/>
+  <text class="lbl" x="675" y="1506" text-anchor="middle">server.py — Flask :5000</text>
+  <text class="note" x="675" y="1525" text-anchor="middle">POST / register username or update scores</text>
+  <text class="note" x="675" y="1544" text-anchor="middle">GET /get_status</text>
+  <path class="edge" d="M80,636 V1370" marker-end="url(#ah)"/>
+  <text class="elbl" x="90" y="1324">username POST (entry + game start)</text>
+  <path class="edge" d="M575,880 V1394 H316" marker-end="url(#ah)"/>
+  <text class="elbl" x="340" y="1381">rematch: username POST</text>
+  <path class="edge" d="M860,620 H966 V1424 H316" marker-end="url(#ah)"/>
+  <text class="elbl" x="600" y="1411">score POST every round end</text>
+  <path class="edge" d="M176,1450 V1488" marker-end="url(#ah)"/>
+  <text class="elbl" x="186" y="1475">POST /things/FinalThing/shadow</text>
+  <path class="edge" d="M240,1525 H286" marker-end="url(#ah)"/>
+  <path class="edge" d="M490,1525 H536" marker-end="url(#ah)"/>
+
+  <!-- ===== Legend ===== -->
+  <text class="glbl" x="40" y="1602">LEGEND</text>
+  <rect class="b-orange" x="40" y="1616" width="26" height="14" rx="4"/>
+  <text class="note" x="78" y="1627">player inputs</text>
+  <rect class="b-green" x="270" y="1616" width="26" height="14" rx="4"/>
+  <text class="note" x="308" y="1627">interrupt layer (ISRs)</text>
+  <rect class="b-blue" x="500" y="1616" width="26" height="14" rx="4"/>
+  <text class="note" x="538" y="1627">main.c game loop</text>
+  <rect class="b-purple" x="730" y="1616" width="26" height="14" rx="4"/>
+  <text class="note" x="768" y="1627">display path</text>
+  <rect class="b-red" x="40" y="1638" width="26" height="14" rx="4"/>
+  <text class="note" x="78" y="1649">board link (UART1)</text>
+  <rect class="b-gray" x="270" y="1638" width="26" height="14" rx="4"/>
+  <text class="note" x="308" y="1649">score pipeline</text>
+  <rect class="b-planned" x="500" y="1638" width="26" height="14" rx="4"/>
+  <text class="note" x="538" y="1649">dashed box = not in this repo</text>
+  <path class="edge" d="M730,1645 H756" marker-end="url(#ah)"/>
+  <text class="note" x="768" y="1649">control flow / calls</text>
+  <path class="edge-dash" d="M40,1667 H66" marker-end="url(#ah)"/>
+  <text class="note" x="78" y="1671">volatile-global data flow between ISRs and the loop (incl. the SysTick counter)</text>
+</svg>

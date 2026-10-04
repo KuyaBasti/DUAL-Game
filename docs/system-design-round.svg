@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1306" width="1000" height="1306" role="img" aria-label="DUAL deep dive 1, one round end to end: board B charges and fires a shot, sends it to board A over UART1, board A detects the hit and replies QUIT, then both boards, each on its own clock, POST their scores to the AWS IoT shadow in parallel, and an AWS IoT Rule with an HTTP action relays each shadow update to Flask">
+  <style>
+    .bg{fill:#ffffff}
+    .title{fill:#1f2328;font:600 22px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .sub{fill:#59636e;font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .lbl{fill:#1f2328;font:600 14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .note{fill:#59636e;font:12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .glbl{fill:#59636e;font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;letter-spacing:.06em}
+    .elbl{fill:#59636e;font:11px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .edge{stroke:#818b98;stroke-width:1.6;fill:none}
+    .edge-dash{stroke:#818b98;stroke-width:1.6;fill:none;stroke-dasharray:6 4}
+    .arrow{fill:#818b98}
+    .group{fill:none;stroke:#d1d9e0;stroke-width:1.2;stroke-dasharray:4 4}
+    .b-blue{fill:#ddf4ff;stroke:#54aeff;stroke-width:1.5}
+    .b-green{fill:#dafbe1;stroke:#4ac26b;stroke-width:1.5}
+    .b-purple{fill:#fbefff;stroke:#c297ff;stroke-width:1.5}
+    .b-orange{fill:#fff1e5;stroke:#fb8f44;stroke-width:1.5}
+    .b-gray{fill:#f6f8fa;stroke:#d1d9e0;stroke-width:1.5}
+    .b-red{fill:#ffebe9;stroke:#ff8182;stroke-width:1.5}
+    .b-planned{fill:#f6f8fa;stroke:#818b98;stroke-width:1.5;stroke-dasharray:5 4}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#0d1117}
+      .title,.lbl{fill:#e6edf3}
+      .sub,.note,.glbl,.elbl{fill:#9198a1}
+      .edge,.edge-dash{stroke:#9198a1}
+      .arrow{fill:#9198a1}
+      .group{stroke:#3d444d}
+      .b-blue{fill:#0c2d6b;stroke:#4493f8}
+      .b-green{fill:#0f3b1e;stroke:#3fb950}
+      .b-purple{fill:#2e1a4f;stroke:#ab7df8}
+      .b-orange{fill:#3d1f0a;stroke:#f0883e}
+      .b-gray{fill:#151b23;stroke:#3d444d}
+      .b-red{fill:#3c1618;stroke:#f85149}
+      .b-planned{fill:#151b23;stroke:#9198a1}
+    }
+  </style>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="arrow" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1000" height="1306" rx="12"/>
+  <text class="title" x="32" y="48">DUAL — one round, end to end</text>
+
+  <!-- legend row 1: header + step-badge colors -->
+  <g>
+    <rect class="b-blue" x="32" y="66" width="12" height="12" rx="3"/>
+    <text class="elbl" x="50" y="76">board B</text>
+    <rect class="b-red" x="113" y="66" width="12" height="12" rx="3"/>
+    <text class="elbl" x="131" y="76">board A</text>
+    <rect class="b-purple" x="194" y="66" width="12" height="12" rx="3"/>
+    <text class="elbl" x="212" y="76">AWS IoT shadow</text>
+    <rect class="b-green" x="321" y="66" width="12" height="12" rx="3"/>
+    <text class="elbl" x="339" y="76">Flask via IoT Rule</text>
+    <rect class="b-gray" x="451" y="66" width="12" height="12" rx="3"/>
+    <text class="elbl" x="469" y="76">both boards</text>
+    <rect class="b-orange" x="554" y="66" width="12" height="12" rx="3"/>
+    <text class="elbl" x="572" y="76">Note</text>
+  </g>
+  <!-- legend row 2: arrow styles -->
+  <g>
+    <line class="edge" x1="32" y1="92" x2="62" y2="92" marker-end="url(#ah)"/>
+    <text class="elbl" x="70" y="96">direct message</text>
+    <line class="edge-dash" x1="172" y1="92" x2="202" y2="92" marker-end="url(#ah)"/>
+    <text class="elbl" x="210" y="96">relayed by AWS (IoT Rule, not in this repo)</text>
+  </g>
+
+  <!-- participants + lifelines -->
+  <g>
+    <line class="group" x1="110" y1="160" x2="110" y2="1284"/>
+    <line class="group" x1="370" y1="160" x2="370" y2="1284"/>
+    <line class="group" x1="655" y1="160" x2="655" y2="1284"/>
+    <line class="group" x1="890" y1="160" x2="890" y2="1284"/>
+    <rect class="b-blue" x="30" y="116" width="160" height="44" rx="10"/>
+    <text class="lbl" x="110" y="143" text-anchor="middle">board B (shooter)</text>
+    <rect class="b-red" x="290" y="116" width="160" height="44" rx="10"/>
+    <text class="lbl" x="370" y="143" text-anchor="middle">board A (victim)</text>
+    <rect class="b-purple" x="580" y="116" width="150" height="44" rx="10"/>
+    <text class="lbl" x="655" y="143" text-anchor="middle">AWS IoT shadow</text>
+    <rect class="b-green" x="810" y="116" width="160" height="44" rx="10"/>
+    <text class="lbl" x="890" y="143" text-anchor="middle">Flask via IoT Rule</text>
+  </g>
+
+  <!-- parallel fragment around steps 9-12 (A's branch above the divider, B's below) -->
+  <g>
+    <rect class="group" x="20" y="760" width="656" height="290" rx="8"/>
+    <line class="group" x1="20" y1="924" x2="676" y2="924"/>
+    <rect class="b-gray" x="20" y="760" width="292" height="26" rx="8"/>
+    <text class="glbl" x="32" y="777">in parallel — each board on its own clock</text>
+  </g>
+
+  <!-- steps, top to bottom -->
+  <g>
+    <!-- step 1 -->
+    <rect class="b-orange" x="30" y="184" width="300" height="52" rx="8"/>
+    <circle class="b-blue" cx="52" cy="210" r="12"/>
+    <text class="lbl" x="52" y="215" text-anchor="middle">1</text>
+    <text class="note" x="74" y="206">SW3 held 1.8 s — TimerA0 spends 3 ammo</text>
+    <text class="note" x="74" y="222">(projectile_scale = 3, size = 6)</text>
+    <!-- step 2 -->
+    <path class="edge" d="M122,276 H136 Q144,276 144,284 V290 Q144,298 136,298 H112" marker-end="url(#ah)"/>
+    <circle class="b-blue" cx="110" cy="276" r="12"/>
+    <text class="lbl" x="110" y="281" text-anchor="middle">2</text>
+    <text class="note" x="154" y="283">SW3 release → falling-edge ISR</text>
+    <text class="note" x="154" y="299">sets switch_intflag</text>
+    <!-- step 3 -->
+    <path class="edge" d="M122,342 H136 Q144,342 144,350 V356 Q144,364 136,364 H112" marker-end="url(#ah)"/>
+    <circle class="b-blue" cx="110" cy="342" r="12"/>
+    <text class="lbl" x="110" y="347" text-anchor="middle">3</text>
+    <text class="note" x="154" y="349">spawn shot — launch spends</text>
+    <text class="note" x="154" y="365">1 more ammo (4 total)</text>
+    <text class="note" x="154" y="381">vy = 10 + 4×3 = 22, vx = current tilt</text>
+    <!-- step 4 -->
+    <rect class="b-orange" x="30" y="412" width="300" height="52" rx="8"/>
+    <circle class="b-blue" cx="52" cy="438" r="12"/>
+    <text class="lbl" x="52" y="443" text-anchor="middle">4</text>
+    <text class="note" x="74" y="434">shot steps down each loop pass,</text>
+    <text class="note" x="74" y="450">crosses y &gt; 128 − size − 1</text>
+    <!-- step 5 -->
+    <line class="edge" x1="122" y1="525" x2="369" y2="525" marker-end="url(#ah)"/>
+    <circle class="b-blue" cx="110" cy="525" r="12"/>
+    <text class="lbl" x="110" y="530" text-anchor="middle">5</text>
+    <text class="note" x="246" y="501" text-anchor="middle">UART1 — 11 bytes:</text>
+    <text class="note" x="246" y="517" text-anchor="middle">x_pos, x_vel, y_vel, size</text>
+    <!-- step 6 -->
+    <path class="edge" d="M382,577 H396 Q404,577 404,585 V591 Q404,599 396,599 H372" marker-end="url(#ah)"/>
+    <circle class="b-red" cx="370" cy="577" r="12"/>
+    <text class="lbl" x="370" y="582" text-anchor="middle">6</text>
+    <text class="note" x="414" y="576">reconstruct — x' = 128 − x,</text>
+    <text class="note" x="414" y="592">y' = 128 − size, vx' = −vx,</text>
+    <text class="note" x="414" y="608">vy' = −vy, first free incoming slot</text>
+    <!-- step 7 -->
+    <rect class="b-orange" x="176" y="639" width="378" height="52" rx="8"/>
+    <circle class="b-red" cx="198" cy="665" r="12"/>
+    <text class="lbl" x="198" y="670" text-anchor="middle">7</text>
+    <text class="note" x="220" y="661">shot enters A's screen at the bottom edge and travels up</text>
+    <text class="note" x="220" y="677">AABB overlap with the 24 px ship</text>
+    <!-- step 8 -->
+    <line class="edge" x1="358" y1="736" x2="111" y2="736" marker-end="url(#ah)"/>
+    <circle class="b-red" cx="370" cy="736" r="12"/>
+    <text class="lbl" x="370" y="741" text-anchor="middle">8</text>
+    <text class="note" x="234" y="728" text-anchor="middle">UART1 — "QUIT" (4 bytes)</text>
+    <!-- step 9 (board A branch) -->
+    <path class="edge" d="M382,808 H396 Q404,808 404,816 V822 Q404,830 396,830 H372" marker-end="url(#ah)"/>
+    <circle class="b-red" cx="370" cy="808" r="12"/>
+    <text class="lbl" x="370" y="813" text-anchor="middle">9</text>
+    <text class="note" x="414" y="823">opponent_score++ — round over</text>
+    <!-- step 10 -->
+    <line class="edge" x1="382" y1="900" x2="654" y2="900" marker-end="url(#ah)"/>
+    <circle class="b-red" cx="370" cy="900" r="12"/>
+    <text class="lbl" x="370" y="905" text-anchor="middle">10</text>
+    <text class="note" x="396" y="858">POST /things/FinalThing/shadow</text>
+    <text class="note" x="396" y="874">{"state":{"desired":{"default":</text>
+    <text class="note" x="396" y="890">{username, my_score, opponent_score}}}}</text>
+    <!-- step 11 (board B branch) -->
+    <path class="edge" d="M122,952 H136 Q144,952 144,960 V966 Q144,974 136,974 H112" marker-end="url(#ah)"/>
+    <circle class="b-blue" cx="110" cy="952" r="12"/>
+    <text class="lbl" x="110" y="957" text-anchor="middle">11</text>
+    <text class="note" x="154" y="959">receive loop matches "QUIT" —</text>
+    <text class="note" x="154" y="975">my_score++</text>
+    <!-- step 12 -->
+    <line class="edge" x1="122" y1="1026" x2="654" y2="1026" marker-end="url(#ah)"/>
+    <circle class="b-blue" cx="110" cy="1026" r="12"/>
+    <text class="lbl" x="110" y="1031" text-anchor="middle">12</text>
+    <text class="note" x="140" y="1002">POST /things/FinalThing/shadow</text>
+    <text class="note" x="140" y="1018">(same envelope)</text>
+    <!-- note on 10 + 12 -->
+    <rect class="b-orange" x="692" y="933" width="180" height="52" rx="8"/>
+    <text class="note" x="704" y="955">POSTs block the game loop</text>
+    <text class="note" x="704" y="971">(sl_Send + sl_Recv)</text>
+    <!-- step 13 -->
+    <line class="edge-dash" x1="667" y1="1106" x2="889" y2="1106" marker-end="url(#ah)"/>
+    <circle class="b-purple" cx="655" cy="1106" r="12"/>
+    <text class="lbl" x="655" y="1111" text-anchor="middle">13</text>
+    <text class="note" x="772" y="1066" text-anchor="middle">shadow update →</text>
+    <text class="note" x="772" y="1082" text-anchor="middle">IoT Rule (HTTP action) →</text>
+    <text class="note" x="772" y="1098" text-anchor="middle">POST / {"iotMessage": {…}}</text>
+    <text class="note" x="772" y="1124" text-anchor="middle">one relay POST per shadow POST</text>
+    <!-- step 14 -->
+    <path class="edge" d="M878,1154 H864 Q856,1154 856,1162 V1168 Q856,1176 864,1176 H888" marker-end="url(#ah)"/>
+    <circle class="b-green" cx="890" cy="1154" r="12"/>
+    <text class="lbl" x="890" y="1159" text-anchor="middle">14</text>
+    <text class="note" x="846" y="1161" text-anchor="end">map my/opponent onto</text>
+    <text class="note" x="846" y="1177" text-anchor="end">player1/player2 by username</text>
+    <!-- step 15 -->
+    <rect class="b-orange" x="30" y="1208" width="500" height="52" rx="8"/>
+    <circle class="b-gray" cx="52" cy="1234" r="12"/>
+    <text class="lbl" x="52" y="1239" text-anchor="middle">15</text>
+    <text class="note" x="74" y="1230">if either score ≥ 5 — WIN/LOSE screen:</text>
+    <text class="note" x="74" y="1246">IR keys 0xD2F/0x32F pick rematch/home, 0x58F confirms, boards swap 'r'/'h'</text>
+  </g>
+</svg>
