@@ -2,10 +2,11 @@
 
 > Two screens, one playfield, folded in half.
 >
-> Each CC3200 simulates only its own ship, its own six projectile slots, its
-> own ammo. Tilt comes in over **I2C** from the on-board accelerometer, frames
-> go out over **SPI** to an SSD1351 OLED one byte at a time, and the instant a
-> shot crosses the bottom edge it is packed into **11 bytes on UART1**,
+> Each CC3200 simulates only its own ship, its own six projectile slots (plus
+> six for the peer's incoming shots), its own ammo. Tilt comes in over **I2C**
+> from the on-board accelerometer, frames go out over **SPI** to an SSD1351
+> OLED one byte at a time, and the instant a shot crosses the bottom edge it is
+> packed into **11 bytes on UART1**,
 > mirrored (`x → 128 − x`, velocities negated), and reborn on the opponent's
 > screen travelling the other way. Time lives in two 40 ms interrupts; the
 > game loop itself free-runs. A hit becomes the string `QUIT` to the peer and
@@ -103,8 +104,9 @@ Worth noticing:
 
 ## Deep dive 2 — the packet, and the fold
 
-The entire wire format of the game ([main.c](main.c),
-`UART1SendProjectile` / `UART1ReceiveProjectile`):
+The projectile packet, the game's only structured wire message ([main.c](main.c),
+`UART1SendProjectile` / `UART1ReceiveProjectile`; `READY`, `QUIT` and the
+`r`/`h` vote are bare ASCII):
 
 <p align="center"><img src="docs/packet-and-fold.svg" alt="The 11-byte projectile packet and how the receiver folds it onto its own screen" width="100%"></p>
 
@@ -126,7 +128,7 @@ the 11 bytes (see the sharp edges for why that's a gamble).
 | Component | Layer | Provenance | Where |
 |---|---|---|---|
 | Game loop, physics, collision, round/score state | Game | ✅ implemented here | [main.c](main.c) |
-| IR pulse decoder + multi-tap keypad (ISRs) | Input | ✅ implemented here | [main.c](main.c) |
+| IR pulse decoder (GPIOA0 + SysTick ISRs) + multi-tap keypad (main loop) | Input | ✅ implemented here | [main.c](main.c) |
 | Charge/ammo economy (TimerA0 ISR) | Input | ✅ implemented here | [main.c](main.c) |
 | UART1 link protocol (packets, handshakes) | Link | ✅ implemented here | [main.c](main.c) |
 | AWS shadow client (`jsonify`, `http_post`, `set_time`) | Cloud | ✅ implemented here (on course TLS helpers) | [main.c](main.c) |
@@ -136,10 +138,9 @@ the 11 bytes (see the sharp edges for why that's a gamble).
 | GFX primitives, font | Display | Adafruit BSD, C port | [Adafruit_GFX.c](Adafruit_GFX.c) / [glcdfont.h](glcdfont.h) |
 | Polled I2C master helpers | Board | TI SDK (vendored) | [i2c_if.c](i2c_if.c) |
 | Linker script, CCS project, debug target | Build | TI SDK / CCS (`i2c_demo` template) | [cc3200v1p32.cmd](cc3200v1p32.cmd), [.project](.project), [targetConfigs/](targetConfigs/) |
-| `uart_if` / `gpio_if` / `startup_ccs` | Board | TI SDK, linked by path — not committed | [.project](.project) |
+| `uart_if` / `gpio_if` / `i2c_if` / `startup_ccs` | Board | TI SDK, linked by path — not committed, except `i2c_if.c`, whose committed copy the link shadows | [.project](.project) |
 | `simplelink` + `network_utils` (Wi-Fi, TLS) | Cloud | course-provided — not committed | referenced from [main.c](main.c) |
 | AWS IoT Rule with HTTP action (shadow → Flask) | Cloud | ⬜ external, not in repo | — |
-| Stale build snapshot | — | ⬜ artifact (pre-AWS, Mar 2025) | `Debug/` |
 
 ---
 
@@ -157,7 +158,7 @@ the 11 bytes (see the sharp edges for why that's a gamble).
 | 6 | max ammo = max charge scale = live-shot slots per side (`MAX_PROJECTILES`) |
 | 600 ms | one charge step — 15 held TimerA0 ticks spends 1 ammo |
 | ~1.04 s | ammo recharge period — free-running 26-tick counter; +1 only if SW3 is up at the boundary |
-| 10 + 4×scale / 2×scale | projectile y-velocity / pixel size (max 34 / 12) |
+| 10 + 4×scale / 2×scale | projectile y-velocity / circle radius in px (max 34 / 12) |
 | 24 px | ship size; ammo pips are 4 px squares on its flanks |
 | ×13⁄64, ×0.99 | tilt→acceleration scaling; per-pass velocity friction |
 | > 2000 µs / ≤ 1000 µs | IR start-bit threshold / logic-1 mark width |
@@ -181,17 +182,11 @@ The observable checkpoints the code itself provides:
 
 | Checkpoint | Signal |
 |---|---|
-| Boot + peripherals up | `DisplayBanner("DUAL")` on the UART0 console |
-| Wi-Fi / TLS reachable | `connectToAccessPoint` / `tls_connect` return codes; `POST failed` / `Received failed` on the console (the red-LED call on POST failure is there, but PIN_64, the red LED, is parked as an unused pin in pin_mux_config.c and never set as a GPIO output, so the LED likely never lights) |
+| Boot + early peripherals up (UART, timers, I2C; before SPI/OLED, inputs and Wi-Fi) | `DisplayBanner("DUAL")` on the UART0 console |
+| Wi-Fi / TLS reachable | `tls_connect` return code (`ERR_PRINT` on failure; `connectToAccessPoint`'s return value is overwritten by `set_time()` before anything checks it); `Unable to set time in the device` (then a hang) if `set_time` fails; `POST failed` / `Received failed` on the console (the red-LED calls on both failures are there, but PIN_64, the red LED, is parked as an unused pin in pin_mux_config.c and never set as a GPIO output, so the LED likely never lights) |
 | Cloud path live | `http_post` echoes the full request and the AWS response to the console |
 | Link alive | game only starts once the `READY` wait has read 5 bytes from the peer (any 5 on first boot; after a home vote they must be exactly `READY`); round ends prove packet flow |
 | Scoreboard | [server.py](server.py) prints every player/score update; `GET /get_status` for the JSON |
-
-The `Debug/` snapshot shipped alongside the sources (git-ignored, never
-committed) is *negative* evidence: the March 2025 binary links an
-`oled_test.obj` that no longer exists in the tree and contains no SimpleLink
-code, so it predates the AWS integration — the final firmware was built
-later and was never captured here.
 
 ---
 
@@ -207,14 +202,17 @@ later and was never captured here.
   length, or checksum, and the `QUIT` string-match runs against a partially
   filled packet buffer, so a shot whose first four bytes spell `QUIT`
   (x_pos `0x5155`, x_vel starting `0x4954`) would falsely end the round.
-  Astronomically unlikely, structurally possible.
+  Unreachable with today's value ranges (a sent x_pos stays within one velocity
+  step of the 128-px screen, so its high byte is only ever `0x00` or `0xFF`,
+  and no four consecutive packet bytes spell `QUIT` even on a misaligned
+  stream), but structurally possible.
 - **Implied y over full state** — the receiver derives the spawn row from
   `size`, saving bytes but welding the protocol to the "shots always cross the
   bottom edge" rule; a future power-up that fires sideways breaks the format.
 - **Erase-redraw over framebuffer** — no RAM framebuffer exists; the OLED *is*
   the framebuffer. That makes the 100 kHz SPI the game's true frame clock and
-  produces brief trails when sprites overlap, but it keeps RAM free and avoids
-  a full-screen blit the bus could never afford.
+  lets one sprite's black erase briefly punch holes in any sprite it overlaps,
+  but it keeps RAM free and avoids a full-screen blit the bus could never afford.
 - **`jsonify` writes up to 256 bytes into 100-byte buffers** — every call
   site pairs `snprintf(output, 256, …)` with `char jsonmsg[100]`, and the
   shadow envelope alone is 49 bytes. Every round-end score POST overflows
@@ -249,7 +247,7 @@ later and was never captured here.
 An embedded-systems course lab final (CCS project `lab-final`), grown from
 TI's CC3200 SDK 1.5.0 `i2c_demo` example — [.ccsproject](.ccsproject) records
 the template origin, and [.project](.project) still links `uart_if.c`,
-`gpio_if.c`, and `startup_ccs.c` straight out of the SDK tree. The
+`gpio_if.c`, `startup_ccs.c`, and even `i2c_if.c` (despite the committed copy) straight out of the SDK tree. The
 project-authored work is the game itself in [main.c](main.c) (loop, ISRs, IR
 decoding, multi-tap keypad, UART1 protocol, AWS shadow client) and
 [server.py](server.py); display code is Adafruit's BSD-licensed GFX/SSD1351
