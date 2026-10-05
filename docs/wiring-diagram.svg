@@ -1,160 +1,230 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1020" width="720">
-<rect x="0" y="0" width="720" height="1020" fill="#ffffff"/>
-<rect x="250" y="70" width="160" height="264" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="250" y="62" font-family="Helvetica, Arial, sans-serif" font-size="12.5" fill="#000" text-anchor="start" font-weight="bold">CC3200 LaunchPad — board 1 (PLAYER_MODE 1 = RED)</text>
-<text x="258" y="100" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">VCC</text>
-<text x="258" y="126" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GND</text>
-<text x="258" y="152" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">PIN_61</text>
-<text x="258" y="194" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">PIN_55</text>
-<text x="258" y="220" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">PIN_57</text>
-<text x="258" y="290" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">PIN_01</text>
-<text x="258" y="316" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">PIN_02</text>
-<text x="402" y="100" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_08</text>
-<text x="402" y="130" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_58</text>
-<text x="402" y="160" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_18</text>
-<text x="402" y="190" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_62</text>
-<text x="402" y="220" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_45</text>
-<text x="402" y="250" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_05</text>
-<text x="402" y="280" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_07</text>
-<text x="330" y="328" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#000" text-anchor="middle" font-weight="normal">SW3 fire button = PIN_04</text>
-<rect x="56" y="176" width="124" height="54" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="56" y="166" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#000" text-anchor="start" font-weight="bold">UART0 — USB console</text>
-<text x="172" y="194" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">UART0_TX</text>
-<text x="172" y="220" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">UART0_RX</text>
-<line x1="180" y1="190" x2="250" y2="190" stroke="#000" stroke-width="1.2"/>
-<line x1="180" y1="216" x2="250" y2="216" stroke="#000" stroke-width="1.2"/>
-<rect x="56" y="272" width="124" height="54" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="56" y="262" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#000" text-anchor="start" font-weight="bold">I2C0 — on-board accel (0x18)</text>
-<text x="172" y="290" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">I2C_SCL</text>
-<text x="172" y="316" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">I2C_SDA</text>
-<line x1="180" y1="286" x2="250" y2="286" stroke="#000" stroke-width="1.2"/>
-<line x1="180" y1="312" x2="250" y2="312" stroke="#000" stroke-width="1.2"/>
-<rect x="64" y="380" width="106" height="98" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="64" y="372" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#000" text-anchor="start" font-weight="bold">IR receiver</text>
-<text x="72" y="420" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">DATA</text>
-<text x="72" y="444" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GND</text>
-<text x="72" y="468" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">VCC</text>
-<line x1="170" y1="428" x2="186" y2="428" stroke="#000" stroke-width="1.2"/>
-<circle cx="194" cy="428" r="8" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<line x1="234" y1="402" x2="209" y2="417" stroke="#000" stroke-width="1"/>
-<polygon points="209,417 216,416 212,410" fill="#000"/>
-<line x1="240" y1="414" x2="215" y2="429" stroke="#000" stroke-width="1"/>
-<polygon points="215,429 222,428 218,422" fill="#000"/>
-<text x="210" y="458" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#000" text-anchor="start" font-weight="normal">IR from remote</text>
-<polyline points="250,96 28,96 28,340" fill="none" stroke="#000" stroke-width="1.2"/>
-<rect x="22" y="340" width="12" height="26" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="8" y="357" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#000" text-anchor="start" font-weight="normal">R</text>
-<polyline points="28,366 28,464 64,464" fill="none" stroke="#000" stroke-width="1.2"/>
-<line x1="28" y1="396" x2="30" y2="396" stroke="#000" stroke-width="1.2"/>
-<line x1="30" y1="388" x2="30" y2="404" stroke="#000" stroke-width="1.2"/>
-<line x1="34" y1="388" x2="34" y2="404" stroke="#000" stroke-width="1.2"/>
-<line x1="34" y1="396" x2="36" y2="396" stroke="#000" stroke-width="1.2"/>
-<circle cx="28" cy="396" r="2.5" fill="#000"/>
-<circle cx="36" cy="396" r="2.5" fill="#000"/>
-<text x="12" y="400" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#000" text-anchor="start" font-weight="normal">C</text>
-<line x1="250" y1="122" x2="36" y2="122" stroke="#000" stroke-width="1.2"/>
-<polyline points="36,122 36,440" fill="none" stroke="#000" stroke-width="1.2"/>
-<line x1="36" y1="440" x2="64" y2="440" stroke="#000" stroke-width="1.2"/>
-<circle cx="36" cy="440" r="2.5" fill="#000"/>
-<polyline points="250,148 44,148 44,416 64,416" fill="none" stroke="#000" stroke-width="1.2"/>
-<rect x="480" y="150" width="142" height="218" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="551" y="166" font-family="Helvetica, Arial, sans-serif" font-size="11.5" fill="#000" text-anchor="middle" font-weight="bold">SSD1351 OLED 128×128</text>
-<line x1="480" y1="172" x2="622" y2="172" stroke="#000" stroke-width="1"/>
-<text x="488" y="190" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GND</text>
-<text x="488" y="218" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">VCC</text>
-<text x="488" y="246" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GSPI_CS</text>
-<text x="488" y="274" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GSPI_RESET</text>
-<text x="488" y="302" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GSPI_DC</text>
-<text x="488" y="330" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GSPI_SCK</text>
-<text x="488" y="358" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GSPI_MOSI</text>
-<line x1="622" y1="186" x2="656" y2="186" stroke="#000" stroke-width="1.2"/>
-<text x="628" y="180" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#000" text-anchor="start" font-weight="normal">GND</text>
-<line x1="622" y1="214" x2="656" y2="214" stroke="#000" stroke-width="1.2"/>
-<text x="628" y="208" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#000" text-anchor="start" font-weight="normal">3V3</text>
-<polyline points="410,156 464,156 464,242 480,242" fill="none" stroke="#000" stroke-width="1.2"/>
-<polyline points="410,186 456,186 456,270 480,270" fill="none" stroke="#000" stroke-width="1.2"/>
-<polyline points="410,216 448,216 448,298 480,298" fill="none" stroke="#000" stroke-width="1.2"/>
-<polyline points="410,246 440,246 440,326 480,326" fill="none" stroke="#000" stroke-width="1.2"/>
-<polyline points="410,276 432,276 432,354 480,354" fill="none" stroke="#000" stroke-width="1.2"/>
-<rect x="250" y="590" width="160" height="264" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="250" y="582" font-family="Helvetica, Arial, sans-serif" font-size="12.5" fill="#000" text-anchor="start" font-weight="bold">CC3200 LaunchPad — board 2 (PLAYER_MODE 0 = BLUE)</text>
-<text x="258" y="620" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">VCC</text>
-<text x="258" y="646" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GND</text>
-<text x="258" y="672" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">PIN_61</text>
-<text x="258" y="714" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">PIN_55</text>
-<text x="258" y="740" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">PIN_57</text>
-<text x="258" y="810" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">PIN_01</text>
-<text x="258" y="836" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">PIN_02</text>
-<text x="402" y="620" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_08</text>
-<text x="402" y="650" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_58</text>
-<text x="402" y="680" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_18</text>
-<text x="402" y="710" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_62</text>
-<text x="402" y="740" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_45</text>
-<text x="402" y="770" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_05</text>
-<text x="402" y="800" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">PIN_07</text>
-<text x="330" y="848" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#000" text-anchor="middle" font-weight="normal">SW3 fire button = PIN_04</text>
-<rect x="56" y="696" width="124" height="54" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="56" y="686" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#000" text-anchor="start" font-weight="bold">UART0 — USB console</text>
-<text x="172" y="714" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">UART0_TX</text>
-<text x="172" y="740" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">UART0_RX</text>
-<line x1="180" y1="710" x2="250" y2="710" stroke="#000" stroke-width="1.2"/>
-<line x1="180" y1="736" x2="250" y2="736" stroke="#000" stroke-width="1.2"/>
-<rect x="56" y="792" width="124" height="54" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="56" y="782" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#000" text-anchor="start" font-weight="bold">I2C0 — on-board accel (0x18)</text>
-<text x="172" y="810" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">I2C_SCL</text>
-<text x="172" y="836" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="end" font-weight="normal">I2C_SDA</text>
-<line x1="180" y1="806" x2="250" y2="806" stroke="#000" stroke-width="1.2"/>
-<line x1="180" y1="832" x2="250" y2="832" stroke="#000" stroke-width="1.2"/>
-<rect x="64" y="900" width="106" height="98" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="64" y="892" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#000" text-anchor="start" font-weight="bold">IR receiver</text>
-<text x="72" y="940" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">DATA</text>
-<text x="72" y="964" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GND</text>
-<text x="72" y="988" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">VCC</text>
-<line x1="170" y1="948" x2="186" y2="948" stroke="#000" stroke-width="1.2"/>
-<circle cx="194" cy="948" r="8" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<line x1="234" y1="922" x2="209" y2="937" stroke="#000" stroke-width="1"/>
-<polygon points="209,937 216,936 212,930" fill="#000"/>
-<line x1="240" y1="934" x2="215" y2="949" stroke="#000" stroke-width="1"/>
-<polygon points="215,949 222,948 218,942" fill="#000"/>
-<text x="210" y="978" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#000" text-anchor="start" font-weight="normal">IR from remote</text>
-<polyline points="250,616 28,616 28,860" fill="none" stroke="#000" stroke-width="1.2"/>
-<rect x="22" y="860" width="12" height="26" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="8" y="877" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#000" text-anchor="start" font-weight="normal">R</text>
-<polyline points="28,886 28,984 64,984" fill="none" stroke="#000" stroke-width="1.2"/>
-<line x1="28" y1="916" x2="30" y2="916" stroke="#000" stroke-width="1.2"/>
-<line x1="30" y1="908" x2="30" y2="924" stroke="#000" stroke-width="1.2"/>
-<line x1="34" y1="908" x2="34" y2="924" stroke="#000" stroke-width="1.2"/>
-<line x1="34" y1="916" x2="36" y2="916" stroke="#000" stroke-width="1.2"/>
-<circle cx="28" cy="916" r="2.5" fill="#000"/>
-<circle cx="36" cy="916" r="2.5" fill="#000"/>
-<text x="12" y="920" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#000" text-anchor="start" font-weight="normal">C</text>
-<line x1="250" y1="642" x2="36" y2="642" stroke="#000" stroke-width="1.2"/>
-<circle cx="36" cy="642" r="2.5" fill="#000"/>
-<line x1="36" y1="960" x2="64" y2="960" stroke="#000" stroke-width="1.2"/>
-<polyline points="250,668 44,668 44,936 64,936" fill="none" stroke="#000" stroke-width="1.2"/>
-<rect x="480" y="670" width="142" height="218" fill="#ffffff" stroke="#000" stroke-width="1.2"/>
-<text x="551" y="686" font-family="Helvetica, Arial, sans-serif" font-size="11.5" fill="#000" text-anchor="middle" font-weight="bold">SSD1351 OLED 128×128</text>
-<line x1="480" y1="692" x2="622" y2="692" stroke="#000" stroke-width="1"/>
-<text x="488" y="710" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GND</text>
-<text x="488" y="738" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">VCC</text>
-<text x="488" y="766" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GSPI_CS</text>
-<text x="488" y="794" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GSPI_RESET</text>
-<text x="488" y="822" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GSPI_DC</text>
-<text x="488" y="850" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GSPI_SCK</text>
-<text x="488" y="878" font-family="Helvetica, Arial, sans-serif" font-size="11" fill="#000" text-anchor="start" font-weight="normal">GSPI_MOSI</text>
-<line x1="622" y1="706" x2="656" y2="706" stroke="#000" stroke-width="1.2"/>
-<text x="628" y="700" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#000" text-anchor="start" font-weight="normal">GND</text>
-<line x1="622" y1="734" x2="656" y2="734" stroke="#000" stroke-width="1.2"/>
-<text x="628" y="728" font-family="Helvetica, Arial, sans-serif" font-size="9" fill="#000" text-anchor="start" font-weight="normal">3V3</text>
-<polyline points="410,676 464,676 464,762 480,762" fill="none" stroke="#000" stroke-width="1.2"/>
-<polyline points="410,706 456,706 456,790 480,790" fill="none" stroke="#000" stroke-width="1.2"/>
-<polyline points="410,736 448,736 448,818 480,818" fill="none" stroke="#000" stroke-width="1.2"/>
-<polyline points="410,766 440,766 440,846 480,846" fill="none" stroke="#000" stroke-width="1.2"/>
-<polyline points="410,796 432,796 432,874 480,874" fill="none" stroke="#000" stroke-width="1.2"/>
-<text x="360" y="26" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#000" text-anchor="middle" font-weight="bold">DUAL — two CC3200 LaunchPads, full wiring</text>
-<line x1="36" y1="440" x2="36" y2="960" stroke="#000" stroke-width="1.2"/>
-<text x="46" y="514" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#000" text-anchor="start" font-weight="normal">GND (shared)</text>
-<polyline points="410,126 672,126 672,616 410,616" fill="none" stroke="#000" stroke-width="1.2"/>
-<polyline points="410,96 682,96 682,646 410,646" fill="none" stroke="#000" stroke-width="1.2"/>
-<text x="660" y="520" font-family="Helvetica, Arial, sans-serif" font-size="10" fill="#000" text-anchor="end" font-weight="normal">UART1 — 115200 8N1</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1300" width="1000" height="1300" role="img" aria-label="DUAL wiring: two CC3200 LaunchPads wired identically. Each board: UART0 USB console on PIN_55/PIN_57, on-board I2C0 accelerometer 0x18 on PIN_01/PIN_02, IR receiver DATA on PIN_61 with VCC through a resistor R and a capacitor C to GND, SSD1351 OLED with CS PIN_18, RESET PIN_62, DC PIN_45, SCK PIN_05, MOSI PIN_07 and GND/3V3, SW3 fire button on PIN_04. UART1 crossover between boards at 115200 8N1: board 1 PIN_08 to board 2 PIN_58 and board 1 PIN_58 to board 2 PIN_08; GND shared between the boards.">
+  <style>
+    .bg{fill:#ffffff}
+    .title{fill:#1f2328;font:600 22px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .sub{fill:#59636e;font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .lbl{fill:#1f2328;font:600 14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .note{fill:#59636e;font:12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .glbl{fill:#59636e;font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;letter-spacing:.06em}
+    .elbl{fill:#59636e;font:11px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .edge{stroke:#818b98;stroke-width:1.6;fill:none}
+    .edge-dash{stroke:#818b98;stroke-width:1.6;fill:none;stroke-dasharray:6 4}
+    .arrow{fill:#818b98}
+    .group{fill:none;stroke:#d1d9e0;stroke-width:1.2;stroke-dasharray:4 4}
+    .b-blue{fill:#ddf4ff;stroke:#54aeff;stroke-width:1.5}
+    .b-green{fill:#dafbe1;stroke:#4ac26b;stroke-width:1.5}
+    .b-purple{fill:#fbefff;stroke:#c297ff;stroke-width:1.5}
+    .b-orange{fill:#fff1e5;stroke:#fb8f44;stroke-width:1.5}
+    .b-gray{fill:#f6f8fa;stroke:#d1d9e0;stroke-width:1.5}
+    .b-red{fill:#ffebe9;stroke:#ff8182;stroke-width:1.5}
+    .b-planned{fill:#f6f8fa;stroke:#818b98;stroke-width:1.5;stroke-dasharray:5 4}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .wire{stroke:#59636e;stroke-width:1.4;fill:none}
+    .dot{fill:#59636e}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#0d1117}
+      .title,.lbl{fill:#e6edf3}
+      .sub,.note,.glbl,.elbl{fill:#9198a1}
+      .edge,.edge-dash{stroke:#9198a1}
+      .arrow{fill:#9198a1}
+      .group{stroke:#3d444d}
+      .b-blue{fill:#0c2d6b;stroke:#4493f8}
+      .b-green{fill:#0f3b1e;stroke:#3fb950}
+      .b-purple{fill:#2e1a4f;stroke:#ab7df8}
+      .b-orange{fill:#3d1f0a;stroke:#f0883e}
+      .b-gray{fill:#151b23;stroke:#3d444d}
+      .b-red{fill:#3c1618;stroke:#f85149}
+      .b-planned{fill:#151b23;stroke:#9198a1}
+      .wire{stroke:#9198a1}
+      .dot{fill:#9198a1}
+    }
+  </style>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="arrow" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1000" height="1300" rx="12"/>
+  <text class="title" x="32" y="48">DUAL — two CC3200 LaunchPads, full wiring</text>
+  <text class="sub" x="32" y="74">Both boards are wired the same and flashed with a different PLAYER_MODE; UART1 crosses over and GND is shared.</text>
+
+  <!-- ===== Board 1 ===== -->
+  <rect class="group" x="16" y="92" width="968" height="520" rx="12"/>
+  <text class="glbl" x="118" y="114">BOARD 1 — PLAYER_MODE 1 = RED</text>
+  <rect class="b-blue" x="400" y="128" width="230" height="354" rx="10"/>
+  <text class="lbl" x="515" y="154" text-anchor="middle">CC3200 LaunchPad</text>
+  <text class="note mono" x="412" y="192">VCC</text>
+  <text class="note mono" x="412" y="216">GND</text>
+  <text class="note mono" x="412" y="240">PIN_61</text>
+  <text class="note mono" x="412" y="316">PIN_55</text>
+  <text class="note mono" x="412" y="340">PIN_57</text>
+  <text class="note mono" x="412" y="420">PIN_01</text>
+  <text class="note mono" x="412" y="444">PIN_02</text>
+  <text class="note mono" x="618" y="192" text-anchor="end">PIN_08</text>
+  <text class="note mono" x="618" y="216" text-anchor="end">PIN_58</text>
+  <text class="note mono" x="618" y="340" text-anchor="end">PIN_18</text>
+  <text class="note mono" x="618" y="364" text-anchor="end">PIN_62</text>
+  <text class="note mono" x="618" y="388" text-anchor="end">PIN_45</text>
+  <text class="note mono" x="618" y="412" text-anchor="end">PIN_05</text>
+  <text class="note mono" x="618" y="436" text-anchor="end">PIN_07</text>
+  <text class="note" x="515" y="468" text-anchor="middle">SW3 fire button = PIN_04</text>
+  <rect class="b-gray" x="118" y="268" width="234" height="84" rx="10"/>
+  <text class="lbl" x="235" y="293" text-anchor="middle">UART0 — USB console</text>
+  <text class="note mono" x="340" y="316" text-anchor="end">UART0_TX</text>
+  <text class="note mono" x="340" y="340" text-anchor="end">UART0_RX</text>
+  <rect class="b-orange" x="118" y="372" width="234" height="84" rx="10"/>
+  <text class="lbl" x="235" y="397" text-anchor="middle">I2C0 — on-board accel (0x18)</text>
+  <text class="note mono" x="340" y="420" text-anchor="end">I2C_SCL</text>
+  <text class="note mono" x="340" y="444" text-anchor="end">I2C_SDA</text>
+  <path class="wire" d="M352,312 H400"/>
+  <path class="wire" d="M352,336 H400"/>
+  <path class="wire" d="M352,416 H400"/>
+  <path class="wire" d="M352,440 H400"/>
+  <rect class="b-orange" x="118" y="488" width="156" height="108" rx="10"/>
+  <text class="lbl" x="196" y="513" text-anchor="middle">IR receiver</text>
+  <text class="note mono" x="130" y="536">DATA</text>
+  <text class="note mono" x="130" y="560">GND</text>
+  <text class="note mono" x="130" y="584">VCC</text>
+  <path class="wire" d="M274,542 H291"/>
+  <circle class="b-orange" data-part="IR window" cx="300" cy="542" r="9"/>
+  <path class="edge" d="M352,502 L314,527" marker-end="url(#ah)"/>
+  <path class="edge" d="M362,516 L322,542" marker-end="url(#ah)"/>
+  <text class="elbl" x="336" y="570">IR from remote</text>
+  <rect class="b-purple" x="690" y="236" width="190" height="212" rx="10"/>
+  <text class="lbl" x="785" y="261" text-anchor="middle">SSD1351 OLED 128×128</text>
+  <text class="note mono" x="702" y="292">GND</text>
+  <text class="note mono" x="702" y="316">VCC</text>
+  <text class="note mono" x="702" y="340">GSPI_CS</text>
+  <text class="note mono" x="702" y="364">GSPI_RESET</text>
+  <text class="note mono" x="702" y="388">GSPI_DC</text>
+  <text class="note mono" x="702" y="412">GSPI_SCK</text>
+  <text class="note mono" x="702" y="436">GSPI_MOSI</text>
+  <path class="wire" d="M630,336 H690"/>
+  <path class="wire" d="M630,360 H690"/>
+  <path class="wire" d="M630,384 H690"/>
+  <path class="wire" d="M630,408 H690"/>
+  <path class="wire" d="M630,432 H690"/>
+  <path class="wire" d="M880,288 H904"/>
+  <text class="elbl" x="909" y="292">GND</text>
+  <path class="wire" d="M880,312 H904"/>
+  <text class="elbl" x="909" y="316">3V3</text>
+  <path class="wire" d="M400,236 H96 V532 H118"/>
+  <path class="wire" d="M400,188 H48 V338"/>
+  <rect class="wire" data-part="R1" x="42" y="338" width="12" height="28"/>
+  <text class="elbl" x="36" y="356" text-anchor="end">R</text>
+  <path class="wire" d="M48,366 V580 H66 A6,6 0 0 1 78,580 H118"/>
+  <path class="wire" d="M48,506 H58"/>
+  <path class="wire" data-part="C1a" d="M58,498 V514"/>
+  <path class="wire" data-part="C1b" d="M62,498 V514"/>
+  <path class="wire" d="M62,506 H72"/>
+  <circle class="dot" cx="48" cy="506" r="3"/>
+  <circle class="dot" cx="72" cy="506" r="3"/>
+  <text class="elbl" x="36" y="510" text-anchor="end">C</text>
+  <path class="wire" d="M72,556 H118"/>
+
+  <!-- ===== Board 2 ===== -->
+  <rect class="group" x="16" y="676" width="968" height="520" rx="12"/>
+  <text class="glbl" x="118" y="698">BOARD 2 — PLAYER_MODE 0 = BLUE</text>
+  <rect class="b-blue" x="400" y="712" width="230" height="354" rx="10"/>
+  <text class="lbl" x="515" y="738" text-anchor="middle">CC3200 LaunchPad</text>
+  <text class="note mono" x="412" y="776">VCC</text>
+  <text class="note mono" x="412" y="800">GND</text>
+  <text class="note mono" x="412" y="824">PIN_61</text>
+  <text class="note mono" x="412" y="900">PIN_55</text>
+  <text class="note mono" x="412" y="924">PIN_57</text>
+  <text class="note mono" x="412" y="1004">PIN_01</text>
+  <text class="note mono" x="412" y="1028">PIN_02</text>
+  <text class="note mono" x="618" y="776" text-anchor="end">PIN_08</text>
+  <text class="note mono" x="618" y="800" text-anchor="end">PIN_58</text>
+  <text class="note mono" x="618" y="924" text-anchor="end">PIN_18</text>
+  <text class="note mono" x="618" y="948" text-anchor="end">PIN_62</text>
+  <text class="note mono" x="618" y="972" text-anchor="end">PIN_45</text>
+  <text class="note mono" x="618" y="996" text-anchor="end">PIN_05</text>
+  <text class="note mono" x="618" y="1020" text-anchor="end">PIN_07</text>
+  <text class="note" x="515" y="1052" text-anchor="middle">SW3 fire button = PIN_04</text>
+  <rect class="b-gray" x="118" y="852" width="234" height="84" rx="10"/>
+  <text class="lbl" x="235" y="877" text-anchor="middle">UART0 — USB console</text>
+  <text class="note mono" x="340" y="900" text-anchor="end">UART0_TX</text>
+  <text class="note mono" x="340" y="924" text-anchor="end">UART0_RX</text>
+  <rect class="b-orange" x="118" y="956" width="234" height="84" rx="10"/>
+  <text class="lbl" x="235" y="981" text-anchor="middle">I2C0 — on-board accel (0x18)</text>
+  <text class="note mono" x="340" y="1004" text-anchor="end">I2C_SCL</text>
+  <text class="note mono" x="340" y="1028" text-anchor="end">I2C_SDA</text>
+  <path class="wire" d="M352,896 H400"/>
+  <path class="wire" d="M352,920 H400"/>
+  <path class="wire" d="M352,1000 H400"/>
+  <path class="wire" d="M352,1024 H400"/>
+  <rect class="b-orange" x="118" y="1072" width="156" height="108" rx="10"/>
+  <text class="lbl" x="196" y="1097" text-anchor="middle">IR receiver</text>
+  <text class="note mono" x="130" y="1120">DATA</text>
+  <text class="note mono" x="130" y="1144">GND</text>
+  <text class="note mono" x="130" y="1168">VCC</text>
+  <path class="wire" d="M274,1126 H291"/>
+  <circle class="b-orange" data-part="IR window" cx="300" cy="1126" r="9"/>
+  <path class="edge" d="M352,1086 L314,1111" marker-end="url(#ah)"/>
+  <path class="edge" d="M362,1100 L322,1126" marker-end="url(#ah)"/>
+  <text class="elbl" x="336" y="1154">IR from remote</text>
+  <rect class="b-purple" x="690" y="820" width="190" height="212" rx="10"/>
+  <text class="lbl" x="785" y="845" text-anchor="middle">SSD1351 OLED 128×128</text>
+  <text class="note mono" x="702" y="876">GND</text>
+  <text class="note mono" x="702" y="900">VCC</text>
+  <text class="note mono" x="702" y="924">GSPI_CS</text>
+  <text class="note mono" x="702" y="948">GSPI_RESET</text>
+  <text class="note mono" x="702" y="972">GSPI_DC</text>
+  <text class="note mono" x="702" y="996">GSPI_SCK</text>
+  <text class="note mono" x="702" y="1020">GSPI_MOSI</text>
+  <path class="wire" d="M630,920 H690"/>
+  <path class="wire" d="M630,944 H690"/>
+  <path class="wire" d="M630,968 H690"/>
+  <path class="wire" d="M630,992 H690"/>
+  <path class="wire" d="M630,1016 H690"/>
+  <path class="wire" d="M880,872 H904"/>
+  <text class="elbl" x="909" y="876">GND</text>
+  <path class="wire" d="M880,896 H904"/>
+  <text class="elbl" x="909" y="900">3V3</text>
+  <path class="wire" d="M400,820 H96 V1116 H118"/>
+  <path class="wire" d="M48,922 V772 H66 A6,6 0 0 1 78,772 H400"/>
+  <rect class="wire" data-part="R2" x="42" y="922" width="12" height="28"/>
+  <text class="elbl" x="36" y="940" text-anchor="end">R</text>
+  <path class="wire" d="M48,950 V1164 H118"/>
+  <path class="wire" d="M48,1090 H58"/>
+  <path class="wire" data-part="C2a" d="M58,1082 V1098"/>
+  <path class="wire" data-part="C2b" d="M62,1082 V1098"/>
+  <path class="wire" d="M62,1090 H72"/>
+  <circle class="dot" cx="48" cy="1090" r="3"/>
+  <circle class="dot" cx="72" cy="1090" r="3"/>
+  <text class="elbl" x="36" y="1094" text-anchor="end">C</text>
+
+  <!-- ===== Between the boards ===== -->
+  <path class="wire" d="M400,212 H72 V1140 H118"/>
+  <path class="wire" d="M72,796 H400"/>
+  <circle class="dot" cx="72" cy="556" r="3"/>
+  <circle class="dot" cx="72" cy="796" r="3"/>
+  <text class="elbl" x="82" y="646">GND (shared)</text>
+  <path class="wire" d="M630,188 H966 V796 H630"/>
+  <path class="wire" d="M630,212 H950 V772 H630"/>
+  <text class="elbl" x="938" y="638" text-anchor="end">UART1 — 115200 8N1</text>
+  <text class="elbl" x="938" y="654" text-anchor="end">crossover: PIN_58 (TX) → PIN_08 (RX), both ways</text>
+
+  <!-- ===== Legend ===== -->
+  <text class="glbl" x="32" y="1230">LEGEND</text>
+  <rect class="b-blue" x="32" y="1244" width="26" height="14" rx="4"/>
+  <text class="note" x="70" y="1255">CC3200 LaunchPad</text>
+  <rect class="b-purple" x="272" y="1244" width="26" height="14" rx="4"/>
+  <text class="note" x="310" y="1255">SSD1351 OLED display</text>
+  <rect class="b-orange" x="512" y="1244" width="26" height="14" rx="4"/>
+  <text class="note" x="550" y="1255">sensors / inputs</text>
+  <rect class="b-gray" x="752" y="1244" width="26" height="14" rx="4"/>
+  <text class="note" x="790" y="1255">USB console</text>
+  <path class="wire" d="M32,1273 H58"/>
+  <text class="note" x="70" y="1277">wire</text>
+  <path class="wire" d="M272,1273 H298"/>
+  <path class="wire" d="M285,1266 V1280"/>
+  <circle class="dot" cx="285" cy="1273" r="3"/>
+  <text class="note" x="310" y="1277">dot = wires joined</text>
+  <path class="wire" d="M512,1273 H519 A6,6 0 0 1 531,1273 H538"/>
+  <path class="wire" d="M525,1265 V1281"/>
+  <text class="note" x="550" y="1277">hop = wires cross, not joined</text>
+  <path class="edge" d="M752,1267 L772,1279" marker-end="url(#ah)"/>
+  <text class="note" x="790" y="1277">IR light (not a wire)</text>
 </svg>

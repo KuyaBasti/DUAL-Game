@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1699" width="1000" height="1699" role="img" aria-label="How a round of DUAL works on one board, from main.c: boot, the IR username screen, the READY swap (send READY and POST the username, then wait for any 5 bytes; an exact READY re-arms game_running after a home vote), game start, then the free-running round loop: read at most one UART1 packet per pass (a QUIT means the round is won, an 11-byte packet becomes a mirrored incoming shot), move the ship by tilt, fire on SW3 release, step my shots and send any that cross the bottom edge, step incoming shots and send QUIT if one hits my ship. A round end goes to the next round until a score reaches 5, then the WIN/LOSE screen swaps an r/h vote: both r is a rematch, either h goes home to the username screen.">
+  <style>
+    .bg{fill:#ffffff}
+    .title{fill:#1f2328;font:600 22px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .sub{fill:#59636e;font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .lbl{fill:#1f2328;font:600 14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .note{fill:#59636e;font:12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .glbl{fill:#59636e;font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;letter-spacing:.06em}
+    .elbl{fill:#59636e;font:11px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .edge{stroke:#818b98;stroke-width:1.6;fill:none}
+    .edge-dash{stroke:#818b98;stroke-width:1.6;fill:none;stroke-dasharray:6 4}
+    .arrow{fill:#818b98}
+    .group{fill:none;stroke:#d1d9e0;stroke-width:1.2;stroke-dasharray:4 4}
+    .b-blue{fill:#ddf4ff;stroke:#54aeff;stroke-width:1.5}
+    .b-green{fill:#dafbe1;stroke:#4ac26b;stroke-width:1.5}
+    .b-purple{fill:#fbefff;stroke:#c297ff;stroke-width:1.5}
+    .b-orange{fill:#fff1e5;stroke:#fb8f44;stroke-width:1.5}
+    .b-gray{fill:#f6f8fa;stroke:#d1d9e0;stroke-width:1.5}
+    .b-red{fill:#ffebe9;stroke:#ff8182;stroke-width:1.5}
+    .b-planned{fill:#f6f8fa;stroke:#818b98;stroke-width:1.5;stroke-dasharray:5 4}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .wire{stroke:#59636e;stroke-width:1.4;fill:none}
+    .dot{fill:#59636e}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#0d1117}
+      .title,.lbl{fill:#e6edf3}
+      .sub,.note,.glbl,.elbl{fill:#9198a1}
+      .edge,.edge-dash{stroke:#9198a1}
+      .arrow{fill:#9198a1}
+      .group{stroke:#3d444d}
+      .b-blue{fill:#0c2d6b;stroke:#4493f8}
+      .b-green{fill:#0f3b1e;stroke:#3fb950}
+      .b-purple{fill:#2e1a4f;stroke:#ab7df8}
+      .b-orange{fill:#3d1f0a;stroke:#f0883e}
+      .b-gray{fill:#151b23;stroke:#3d444d}
+      .b-red{fill:#3c1618;stroke:#f85149}
+      .b-planned{fill:#151b23;stroke:#9198a1}
+      .wire{stroke:#9198a1}
+      .dot{fill:#9198a1}
+    }
+  </style>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="arrow" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1000" height="1699" rx="12"/>
+  <text class="title" x="32" y="48">DUAL — how a round works</text>
+  <text class="sub" x="32" y="74">One board’s view of main.c: the READY swap, the free-running round loop, first to 5, then rematch or home.</text>
+
+  <!-- ===== setup ===== -->
+  <rect class="b-blue" x="70" y="92" width="460" height="72" rx="10"/>
+  <text class="lbl" x="300" y="115" text-anchor="middle">boot</text>
+  <text class="note" x="300" y="133" text-anchor="middle">pin mux · UART1 115200 8N1 · SysTick + TimerA0 at 40 ms · I2C 400 kHz</text>
+  <text class="note" x="300" y="150" text-anchor="middle">SPI 100 kHz + OLED init · SW3 + IR interrupts · Wi-Fi + TLS to AWS</text>
+  <path class="edge" d="M300,164 V182" marker-end="url(#ah)"/>
+  <rect class="b-blue" x="110" y="186" width="380" height="56" rx="10"/>
+  <text class="lbl" x="300" y="209" text-anchor="middle">username screen</text>
+  <text class="note" x="300" y="227" text-anchor="middle">multi-tap entry via IR remote · 0xD6F submits</text>
+  <path class="edge" d="M300,242 V260" marker-end="url(#ah)"/>
+  <rect class="b-red" x="110" y="264" width="380" height="72" rx="10"/>
+  <text class="lbl" x="300" y="287" text-anchor="middle">READY swap over UART1</text>
+  <text class="note" x="300" y="305" text-anchor="middle">send "READY" + POST username, then wait for any 5 bytes</text>
+  <text class="note" x="300" y="322" text-anchor="middle">an exact "READY" re-arms game_running (true from boot)</text>
+  <path class="edge" d="M300,336 V354" marker-end="url(#ah)"/>
+  <rect class="b-green" x="110" y="358" width="380" height="56" rx="10"/>
+  <text class="lbl" x="300" y="381" text-anchor="middle">game start</text>
+  <text class="note" x="300" y="399" text-anchor="middle">scores = 0 · POST username again</text>
+  <path class="edge" d="M300,414 V432" marker-end="url(#ah)"/>
+  <polygon class="b-gray" points="300,436 400,466 300,496 200,466"/>
+  <text class="lbl" x="300" y="471" text-anchor="middle">game_running?</text>
+  <path class="edge" d="M400,466 H570 V226 H494" marker-end="url(#ah)"/>
+  <text class="elbl" x="582" y="344">no — only after a home vote, when</text>
+  <text class="elbl" x="582" y="358">those 5 bytes weren’t "READY"</text>
+  <path class="edge" d="M300,496 V514" marker-end="url(#ah)"/>
+  <text class="elbl" x="310" y="512">yes</text>
+  <rect class="b-blue" x="110" y="518" width="380" height="56" rx="10"/>
+  <text class="lbl" x="300" y="541" text-anchor="middle">round start</text>
+  <text class="note" x="300" y="559" text-anchor="middle">clear screen · center ship · clear 6 + 6 shot slots</text>
+
+  <!-- ===== round loop: one pass ===== -->
+  <rect class="group" x="70" y="592" width="886" height="733" rx="12"/>
+  <text class="glbl" x="86" y="612">ROUND LOOP — EACH PASS</text>
+  <path class="edge" d="M300,574 V622" marker-end="url(#ah)"/>
+  <polygon class="b-gray" points="300,626 410,656 300,686 190,656"/>
+  <text class="lbl" x="300" y="661" text-anchor="middle">bytes on UART1?</text>
+  <path class="edge" d="M410,656 H586" marker-end="url(#ah)"/>
+  <text class="elbl" x="500" y="634" text-anchor="middle">yes — one read per pass,</text>
+  <text class="elbl" x="500" y="648" text-anchor="middle">blocks for 11 bytes or QUIT</text>
+  <polygon class="b-gray" points="680,626 770,656 680,686 590,656"/>
+  <text class="lbl" x="680" y="661" text-anchor="middle">what arrived?</text>
+  <path class="edge" d="M770,656 H842" marker-end="url(#ah)"/>
+  <text class="elbl" x="808" y="648" text-anchor="middle">“QUIT”</text>
+  <rect class="b-green" x="846" y="620" width="100" height="72" rx="10"/>
+  <text class="lbl" x="896" y="643" text-anchor="middle">round won</text>
+  <text class="note" x="896" y="661" text-anchor="middle">my_score++</text>
+  <text class="note" x="896" y="678" text-anchor="middle">POST score</text>
+  <path class="edge" d="M680,686 V715" marker-end="url(#ah)"/>
+  <text class="elbl" x="690" y="703">11-byte packet</text>
+  <rect class="b-red" x="520" y="719" width="320" height="72" rx="10"/>
+  <text class="lbl" x="680" y="742" text-anchor="middle">mirror the incoming shot</text>
+  <text class="note" x="680" y="760" text-anchor="middle">x = 128 − x · y = 128 − size · negate velocities</text>
+  <text class="note" x="680" y="777" text-anchor="middle">into the first free incoming slot (of 6)</text>
+  <path class="edge" d="M520,755.0 H494" marker-end="url(#ah)"/>
+  <path class="edge" d="M300,686 V715" marker-end="url(#ah)"/>
+  <text class="elbl" x="310" y="703">no</text>
+  <rect class="b-orange" x="110" y="719" width="380" height="72" rx="10"/>
+  <text class="lbl" x="300" y="742" text-anchor="middle">move ship by tilt — polled every pass</text>
+  <text class="note" x="300" y="760" text-anchor="middle">I2C burst-read regs 0x02–0x05: keeps 0x05 → x, 0x03 → y</text>
+  <text class="note" x="300" y="777" text-anchor="middle">accel = tilt × 13/64 · v = (v + accel) × 0.99 · move · clamp</text>
+  <path class="edge" d="M300,791 V809" marker-end="url(#ah)"/>
+  <polygon class="b-gray" points="300,813 410,843 300,873 190,843"/>
+  <text class="lbl" x="300" y="848" text-anchor="middle">SW3 released?</text>
+  <path class="edge" d="M410,843 H516" marker-end="url(#ah)"/>
+  <text class="elbl" x="465" y="821" text-anchor="middle">yes — ammo left</text>
+  <text class="elbl" x="465" y="835" text-anchor="middle">or charged</text>
+  <rect class="b-orange" x="520" y="807" width="320" height="72" rx="10"/>
+  <text class="lbl" x="680" y="830" text-anchor="middle">spawn shot — 1 more ammo, if any left</text>
+  <text class="note" x="680" y="848" text-anchor="middle">charge = max(1, ammo TimerA0 spent while held)</text>
+  <text class="note" x="680" y="865" text-anchor="middle">size 2×charge · vy 10 + 4×charge · vx = x accel</text>
+  <path class="edge" d="M680,879.0 V934.0 H494" marker-end="url(#ah)"/>
+  <path class="edge" d="M300,873 V902" marker-end="url(#ah)"/>
+  <text class="elbl" x="310" y="890">no, or no ammo and no charge</text>
+  <rect class="b-blue" x="110" y="906" width="380" height="56" rx="10"/>
+  <text class="lbl" x="300" y="929" text-anchor="middle">step my shots</text>
+  <text class="note" x="300" y="947" text-anchor="middle">each of 6 slots: erase · move · side exits vanish</text>
+  <path class="edge" d="M300,962 V980" marker-end="url(#ah)"/>
+  <polygon class="b-gray" points="300,984 410,1014 300,1044 190,1014"/>
+  <text class="lbl" x="300" y="1019" text-anchor="middle">past bottom edge?</text>
+  <path class="edge" d="M410,1014 H516" marker-end="url(#ah)"/>
+  <text class="elbl" x="465" y="1006" text-anchor="middle">yes</text>
+  <rect class="b-red" x="520" y="978" width="320" height="72" rx="10"/>
+  <text class="lbl" x="680" y="1001" text-anchor="middle">send it to the other board</text>
+  <text class="note" x="680" y="1019" text-anchor="middle">UART1SendProjectile — 11 bytes</text>
+  <text class="note" x="680" y="1036" text-anchor="middle">x, vx, vy, size (y is implied)</text>
+  <path class="edge" d="M680,1050.0 V1105.0 H494" marker-end="url(#ah)"/>
+  <path class="edge" d="M300,1044 V1073" marker-end="url(#ah)"/>
+  <text class="elbl" x="310" y="1061">no — redraw if still on screen</text>
+  <rect class="b-blue" x="110" y="1077" width="380" height="56" rx="10"/>
+  <text class="lbl" x="300" y="1100" text-anchor="middle">step incoming shots</text>
+  <text class="note" x="300" y="1118" text-anchor="middle">each of 6 slots: erase · move by velocity</text>
+  <path class="edge" d="M300,1133 V1151" marker-end="url(#ah)"/>
+  <polygon class="b-gray" points="300,1155 410,1185 300,1215 190,1185"/>
+  <text class="lbl" x="300" y="1190" text-anchor="middle">hits my 24 px ship?</text>
+  <path class="edge" d="M190,1185 H86 V656 H186" marker-end="url(#ah)"/>
+  <text class="elbl" x="94" y="1157">no: redraw, or drop</text>
+  <text class="elbl" x="94" y="1171">if off-screen; next pass</text>
+  <path class="edge" d="M300,1215 V1233" marker-end="url(#ah)"/>
+  <text class="elbl" x="310" y="1231">yes</text>
+  <rect class="b-green" x="110" y="1237" width="380" height="72" rx="10"/>
+  <text class="lbl" x="300" y="1260" text-anchor="middle">round lost</text>
+  <text class="note" x="300" y="1278" text-anchor="middle">send "QUIT" (4 bytes) · opponent_score++</text>
+  <text class="note" x="300" y="1295" text-anchor="middle">POST score</text>
+
+  <!-- ===== round over: next round, or WIN/LOSE + vote ===== -->
+  <path class="edge" d="M300,1309 V1341" marker-end="url(#ah)"/>
+  <polygon class="b-gray" points="300,1345 410,1375 300,1405 190,1375"/>
+  <text class="lbl" x="300" y="1380" text-anchor="middle">either score ≥ 5?</text>
+  <path class="edge" d="M896.0,692.0 V1375 H414" marker-end="url(#ah)"/>
+  <text class="elbl" x="653" y="1367" text-anchor="middle">round over — the other board was hit</text>
+  <path class="edge" d="M190,1375 H54 V558 H106" marker-end="url(#ah)"/>
+  <text class="elbl" x="126" y="1367" text-anchor="middle">no — next round</text>
+  <path class="edge" d="M300,1405 V1423" marker-end="url(#ah)"/>
+  <text class="elbl" x="310" y="1421">yes</text>
+  <rect class="b-blue" x="110" y="1427" width="380" height="72" rx="10"/>
+  <text class="lbl" x="300" y="1450" text-anchor="middle">WIN / LOSE screen</text>
+  <text class="note" x="300" y="1468" text-anchor="middle">IR menu: 0xD2F rematch · 0x32F home · 0x58F confirms</text>
+  <text class="note" x="300" y="1485" text-anchor="middle">scores = 0 · send ‘r’ or ‘h’ · wait for the peer’s byte</text>
+  <path class="edge" d="M300,1499 V1517" marker-end="url(#ah)"/>
+  <polygon class="b-gray" points="300,1521 410,1551 300,1581 190,1551"/>
+  <text class="lbl" x="300" y="1556" text-anchor="middle">both sent ‘r’?</text>
+  <path class="edge" d="M410,1551 H966 V202 H494" marker-end="url(#ah)"/>
+  <text class="elbl" x="426" y="1543">no — either board sent ‘h’: home</text>
+  <path class="edge" d="M300,1581 V1599" marker-end="url(#ah)"/>
+  <text class="elbl" x="310" y="1597">yes</text>
+  <rect class="b-green" x="110" y="1603" width="380" height="56" rx="10"/>
+  <text class="lbl" x="300" y="1626" text-anchor="middle">rematch</text>
+  <text class="note" x="300" y="1644" text-anchor="middle">POST username · next match starts</text>
+  <path class="edge" d="M110,1631.0 H30 V534 H106" marker-end="url(#ah)"/>
+
+  <!-- ===== legend ===== -->
+  <text class="glbl" x="540" y="1597">LEGEND</text>
+  <rect class="b-blue" x="540" y="1611" width="26" height="14" rx="4"/>
+  <text class="note" x="578" y="1622">screen / game step</text>
+  <rect class="b-orange" x="760" y="1611" width="26" height="14" rx="4"/>
+  <text class="note" x="798" y="1622">player input (tilt, SW3)</text>
+  <rect class="b-red" x="540" y="1633" width="26" height="14" rx="4"/>
+  <text class="note" x="578" y="1644">UART1 link to the other board</text>
+  <rect class="b-green" x="760" y="1633" width="26" height="14" rx="4"/>
+  <text class="note" x="798" y="1644">score change + AWS POST</text>
+  <polygon class="b-gray" points="553,1654 567,1662 553,1670 539,1662"/>
+  <text class="note" x="578" y="1666">decision</text>
+  <path class="edge" d="M760,1662 H786" marker-end="url(#ah)"/>
+  <text class="note" x="798" y="1666">control flow</text>
+</svg>

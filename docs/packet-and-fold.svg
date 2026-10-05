@@ -1,0 +1,290 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1388" width="1000" height="1388" role="img" aria-label="DUAL deep dive 2, the packet and the fold: an 11-byte big-endian UART1 packet with x_position in bytes 0 to 1 (16 bits), x_velocity in bytes 2 to 5 (32 bits), y_velocity in bytes 6 to 9 (32 bits) and size in byte 10 (8 bits), with no start byte, length or checksum and no y_position. Board B fires a shot that falls and crosses its bottom edge, the packet goes over UART1, and board A rebuilds it as x' = 128 − x, y' = 128 − size, vx' = −vx, vy' = −vy, so it enters at A's bottom edge and rises toward A's ship. Both ships start centred at (52, 52). Together the formulas turn A's screen 180 degrees about the shared bottom edge.">
+  <style>
+    .bg{fill:#ffffff}
+    .title{fill:#1f2328;font:600 22px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .sub{fill:#59636e;font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .lbl{fill:#1f2328;font:600 14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .note{fill:#59636e;font:12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .glbl{fill:#59636e;font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;letter-spacing:.06em}
+    .elbl{fill:#59636e;font:11px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .edge{stroke:#818b98;stroke-width:1.6;fill:none}
+    .edge-dash{stroke:#818b98;stroke-width:1.6;fill:none;stroke-dasharray:6 4}
+    .arrow{fill:#818b98}
+    .group{fill:none;stroke:#d1d9e0;stroke-width:1.2;stroke-dasharray:4 4}
+    .b-blue{fill:#ddf4ff;stroke:#54aeff;stroke-width:1.5}
+    .b-green{fill:#dafbe1;stroke:#4ac26b;stroke-width:1.5}
+    .b-purple{fill:#fbefff;stroke:#c297ff;stroke-width:1.5}
+    .b-orange{fill:#fff1e5;stroke:#fb8f44;stroke-width:1.5}
+    .b-gray{fill:#f6f8fa;stroke:#d1d9e0;stroke-width:1.5}
+    .b-red{fill:#ffebe9;stroke:#ff8182;stroke-width:1.5}
+    .b-planned{fill:#f6f8fa;stroke:#818b98;stroke-width:1.5;stroke-dasharray:5 4}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .wire{stroke:#59636e;stroke-width:1.4;fill:none}
+    .dot{fill:#59636e}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#0d1117}
+      .title,.lbl{fill:#e6edf3}
+      .sub,.note,.glbl,.elbl{fill:#9198a1}
+      .edge,.edge-dash{stroke:#9198a1}
+      .arrow{fill:#9198a1}
+      .group{stroke:#3d444d}
+      .b-blue{fill:#0c2d6b;stroke:#4493f8}
+      .b-green{fill:#0f3b1e;stroke:#3fb950}
+      .b-purple{fill:#2e1a4f;stroke:#ab7df8}
+      .b-orange{fill:#3d1f0a;stroke:#f0883e}
+      .b-gray{fill:#151b23;stroke:#3d444d}
+      .b-red{fill:#3c1618;stroke:#f85149}
+      .b-planned{fill:#151b23;stroke:#9198a1}
+      .wire{stroke:#9198a1}
+      .dot{fill:#9198a1}
+    }
+  </style>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="arrow" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1000" height="1388" rx="12"/>
+  <text class="title" x="32" y="48">DUAL — the packet, and the fold</text>
+  <text class="sub" x="32" y="74">A shot crosses the board link once, as 11 bytes; the receiver rebuilds it mirrored and simulates the rest.</text>
+
+  <!-- ============ (a) THE PACKET ============ -->
+  <g>
+    <rect class="group" x="24" y="96" width="952" height="284" rx="12"/>
+    <text class="glbl" x="40" y="120">THE PACKET — 11 BYTES ON UART1, BIG-ENDIAN, BYTE 0 SENT FIRST</text>
+    <text class="elbl mono" x="960" y="120" text-anchor="end">main.c 420–483</text>
+
+    <!-- row captions -->
+    <text class="elbl" x="40" y="150">byte</text>
+    <text class="elbl" x="40" y="189">bits</text>
+
+    <!-- byte offsets -->
+    <text class="note mono" x="120" y="150" text-anchor="middle">0</text>
+    <text class="note mono" x="196" y="150" text-anchor="middle">1</text>
+    <text class="note mono" x="272" y="150" text-anchor="middle">2</text>
+    <text class="note mono" x="348" y="150" text-anchor="middle">3</text>
+    <text class="note mono" x="424" y="150" text-anchor="middle">4</text>
+    <text class="note mono" x="500" y="150" text-anchor="middle">5</text>
+    <text class="note mono" x="576" y="150" text-anchor="middle">6</text>
+    <text class="note mono" x="652" y="150" text-anchor="middle">7</text>
+    <text class="note mono" x="728" y="150" text-anchor="middle">8</text>
+    <text class="note mono" x="804" y="150" text-anchor="middle">9</text>
+    <text class="note mono" x="880" y="150" text-anchor="middle">10</text>
+
+    <!-- fields -->
+    <rect class="b-green" x="84" y="160" width="148" height="48" rx="8"/>
+    <line class="b-green" x1="158" y1="160" x2="158" y2="208"/>
+    <rect class="b-purple" x="236" y="160" width="300" height="48" rx="8"/>
+    <line class="b-purple" x1="310" y1="160" x2="310" y2="208"/>
+    <line class="b-purple" x1="386" y1="160" x2="386" y2="208"/>
+    <line class="b-purple" x1="462" y1="160" x2="462" y2="208"/>
+    <rect class="b-orange" x="540" y="160" width="300" height="48" rx="8"/>
+    <line class="b-orange" x1="614" y1="160" x2="614" y2="208"/>
+    <line class="b-orange" x1="690" y1="160" x2="690" y2="208"/>
+    <line class="b-orange" x1="766" y1="160" x2="766" y2="208"/>
+    <rect class="b-gray" x="844" y="160" width="72" height="48" rx="8"/>
+
+    <!-- bit ranges per byte -->
+    <text class="note mono" x="120" y="189" text-anchor="middle">15–8</text>
+    <text class="note mono" x="196" y="189" text-anchor="middle">7–0</text>
+    <text class="note mono" x="272" y="189" text-anchor="middle">31–24</text>
+    <text class="note mono" x="348" y="189" text-anchor="middle">23–16</text>
+    <text class="note mono" x="424" y="189" text-anchor="middle">15–8</text>
+    <text class="note mono" x="500" y="189" text-anchor="middle">7–0</text>
+    <text class="note mono" x="576" y="189" text-anchor="middle">31–24</text>
+    <text class="note mono" x="652" y="189" text-anchor="middle">23–16</text>
+    <text class="note mono" x="728" y="189" text-anchor="middle">15–8</text>
+    <text class="note mono" x="804" y="189" text-anchor="middle">7–0</text>
+    <text class="note mono" x="880" y="189" text-anchor="middle">7–0</text>
+
+    <!-- field names + types -->
+    <text class="lbl mono" x="158" y="234" text-anchor="middle">x_position</text>
+    <text class="note" x="158" y="252" text-anchor="middle">int, low 16 bits</text>
+    <text class="note" x="158" y="268" text-anchor="middle">x where it crossed</text>
+
+    <text class="lbl mono" x="386" y="234" text-anchor="middle">x_velocity</text>
+    <text class="note" x="386" y="252" text-anchor="middle">int, all 32 bits (sign kept)</text>
+    <text class="note" x="386" y="268" text-anchor="middle">= tilt xAcc when fired</text>
+
+    <text class="lbl mono" x="690" y="234" text-anchor="middle">y_velocity</text>
+    <text class="note" x="690" y="252" text-anchor="middle">int, all 32 bits</text>
+    <text class="note" x="690" y="268" text-anchor="middle">= 10 + 4×scale: 14 to 34</text>
+
+    <text class="lbl mono" x="880" y="234" text-anchor="middle">size</text>
+    <text class="note" x="880" y="252" text-anchor="middle">int, low 8 bits</text>
+    <text class="note" x="880" y="268" text-anchor="middle">radius = 2×scale: 2 to 12</text>
+
+    <!-- what is NOT on the wire -->
+    <rect class="b-planned" x="82" y="292" width="410" height="72" rx="10"/>
+    <text class="lbl" x="287" y="318" text-anchor="middle">y_position: not in the packet</text>
+    <text class="note" x="287" y="338" text-anchor="middle">the receiver derives it from byte 10 alone:</text>
+    <text class="note" x="287" y="354" text-anchor="middle">y' = 128 − size, flush with its bottom edge</text>
+
+    <rect class="b-planned" x="508" y="292" width="410" height="72" rx="10"/>
+    <text class="lbl" x="713" y="318" text-anchor="middle">No framing</text>
+    <text class="note" x="713" y="338" text-anchor="middle">no start byte, length or checksum: the receiver counts</text>
+    <text class="note" x="713" y="354" text-anchor="middle">to 11 and string-matches "QUIT" in the same buffer</text>
+  </g>
+
+  <!-- ============ (b) THE FOLD ============ -->
+  <g>
+    <rect class="group" x="24" y="400" width="952" height="564" rx="12"/>
+    <text class="glbl" x="40" y="424">THE FOLD — EITHER BOARD CAN SEND; HERE B SHOOTS AT A</text>
+    <!-- legend -->
+    <circle class="b-blue" cx="652" cy="420" r="6"/>
+    <text class="elbl" x="664" y="424">shot drawn on the OLED</text>
+    <circle class="b-planned" cx="822" cy="420" r="6"/>
+    <text class="elbl" x="834" y="424">computed, never drawn</text>
+
+    <!-- column headers -->
+    <text class="lbl" x="80" y="466">Sender — board B (BLUE build)</text>
+    <text class="note" x="80" y="484">shots fall (vy &gt; 0) and leave at the bottom</text>
+    <text class="lbl mono" x="495" y="466" text-anchor="middle">UART1ReceiveProjectile</text>
+    <text class="note" x="495" y="484" text-anchor="middle">rebuilds the shot on the receiver</text>
+    <text class="lbl" x="664" y="466">Receiver — board A (RED build)</text>
+    <text class="note" x="664" y="484">shots enter at the bottom and rise (vy' &lt; 0)</text>
+
+    <!-- sender screen: px = 80 + 2.25x, py = 520 + 2.25y -->
+    <rect class="b-gray" x="80" y="520" width="288" height="288" rx="3"/>
+    <!-- ship at (52,52), 24x24, ammo 2 -->
+    <text class="elbl" x="224" y="622" text-anchor="middle">ship, starts at (52, 52)</text>
+    <rect class="b-blue" x="197" y="637" width="54" height="54" rx="2"/>
+    <rect class="b-blue" x="257.75" y="682" width="9" height="9" rx="1"/>
+    <rect class="b-blue" x="181.25" y="682" width="9" height="9" rx="1"/>
+    <!-- shot path: (64,82) -> (68,104) -> (72,126) -->
+    <line class="edge" x1="226.4" y1="717.8" x2="230.6" y2="740.7" marker-end="url(#ah)"/>
+    <line class="edge" x1="235.4" y1="767.3" x2="239.6" y2="790.2" marker-end="url(#ah)"/>
+    <circle class="b-planned" cx="224" cy="704.5" r="13.5"/>
+    <circle class="b-blue" cx="233" cy="754" r="13.5"/>
+    <circle class="b-planned" cx="242" cy="803.5" r="13.5"/>
+    <text class="elbl mono" x="202" y="714" text-anchor="end">(64, 82)</text>
+    <text class="elbl mono" x="256" y="758">(68, 104)</text>
+    <text class="elbl mono" x="221" y="796" text-anchor="end">(72, 126) → sent</text>
+    <!-- frame + axes -->
+    <rect class="wire" x="80" y="520" width="288" height="288" rx="3"/>
+    <text class="elbl mono" x="74" y="514" text-anchor="end">(0, 0)</text>
+    <line class="wire" x1="224" y1="515" x2="224" y2="520"/>
+    <line class="wire" x1="368" y1="515" x2="368" y2="520"/>
+    <text class="elbl mono" x="224" y="511" text-anchor="middle">64</text>
+    <text class="elbl mono" x="368" y="511" text-anchor="middle">128</text>
+    <line class="wire" x1="75" y1="664" x2="80" y2="664"/>
+    <line class="wire" x1="75" y1="808" x2="80" y2="808"/>
+    <text class="elbl mono" x="71" y="668" text-anchor="end">64</text>
+    <text class="elbl mono" x="71" y="812" text-anchor="end">128</text>
+
+    <!-- formulas -->
+    <rect class="b-green" x="380" y="534" width="230" height="52" rx="10"/>
+    <text class="lbl mono" x="495" y="557" text-anchor="middle">x' = 128 − x</text>
+    <text class="note" x="495" y="575" text-anchor="middle">mirror about x = 64: 72 → 56</text>
+
+    <rect class="b-gray" x="380" y="598" width="230" height="52" rx="10"/>
+    <text class="lbl mono" x="495" y="621" text-anchor="middle">y' = 128 − size</text>
+    <text class="note" x="495" y="639" text-anchor="middle">size 6 → 122: on the bottom edge</text>
+
+    <rect class="b-purple" x="380" y="662" width="230" height="52" rx="10"/>
+    <text class="lbl mono" x="495" y="685" text-anchor="middle">vx' = −vx</text>
+    <text class="note" x="495" y="703" text-anchor="middle">4 → −4: right-leaning turns left</text>
+
+    <rect class="b-orange" x="380" y="726" width="230" height="52" rx="10"/>
+    <text class="lbl mono" x="495" y="749" text-anchor="middle">vy' = −vy</text>
+    <text class="note" x="495" y="767" text-anchor="middle">22 → −22: falling turns rising</text>
+
+    <!-- receiver screen: px = 664 + 2.25x, py = 520 + 2.25y -->
+    <rect class="b-gray" x="664" y="520" width="288" height="288" rx="3"/>
+    <!-- ship at (52,52), 24x24, ammo 6 -->
+    <text class="elbl" x="808" y="622" text-anchor="middle">ship, starts at (52, 52)</text>
+    <rect class="b-red" x="781" y="637" width="54" height="54" rx="2"/>
+    <rect class="b-red" x="841.75" y="682" width="9" height="9" rx="1"/>
+    <rect class="b-red" x="765.25" y="682" width="9" height="9" rx="1"/>
+    <rect class="b-red" x="841.75" y="666.25" width="9" height="9" rx="1"/>
+    <rect class="b-red" x="765.25" y="666.25" width="9" height="9" rx="1"/>
+    <rect class="b-red" x="841.75" y="650.5" width="9" height="9" rx="1"/>
+    <rect class="b-red" x="765.25" y="650.5" width="9" height="9" rx="1"/>
+    <!-- shot path: (56,122) -> (52,100) -> (48,78) hit -->
+    <line class="edge" x1="787.6" y1="781.2" x2="783.4" y2="758.3" marker-end="url(#ah)"/>
+    <line class="edge" x1="778.6" y1="731.7" x2="774.4" y2="708.8" marker-end="url(#ah)"/>
+    <circle class="b-planned" cx="790" cy="794.5" r="13.5"/>
+    <circle class="b-blue" cx="781" cy="745" r="13.5"/>
+    <circle class="b-planned" cx="772" cy="695.5" r="13.5"/>
+    <text class="elbl mono" x="750" y="712" text-anchor="end">(48, 78) hit</text>
+    <text class="elbl mono" x="804" y="749">(52, 100)</text>
+    <text class="elbl mono" x="814" y="798">(56, 122)</text>
+    <!-- frame + axes -->
+    <rect class="wire" x="664" y="520" width="288" height="288" rx="3"/>
+    <text class="elbl mono" x="658" y="514" text-anchor="end">(0, 0)</text>
+    <line class="wire" x1="808" y1="515" x2="808" y2="520"/>
+    <line class="wire" x1="952" y1="515" x2="952" y2="520"/>
+    <text class="elbl mono" x="808" y="511" text-anchor="middle">64</text>
+    <text class="elbl mono" x="952" y="511" text-anchor="middle">128</text>
+    <line class="wire" x1="659" y1="664" x2="664" y2="664"/>
+    <line class="wire" x1="659" y1="808" x2="664" y2="808"/>
+    <text class="elbl mono" x="655" y="668" text-anchor="end">64</text>
+    <text class="elbl mono" x="655" y="812" text-anchor="end">128</text>
+
+    <!-- UART1 link: out of B's bottom edge, into A's bottom edge -->
+    <circle class="dot" cx="242" cy="817" r="3"/>
+    <path class="edge" d="M242,817 V846 H790 V810" marker-end="url(#ah)"/>
+    <text class="elbl mono" x="252" y="834">UART1SendProjectile</text>
+    <text class="elbl" x="516" y="864" text-anchor="middle">UART1 · 11 bytes · 115200 8N1</text>
+
+    <!-- captions -->
+    <text class="note" x="80" y="892">fired from (ship_x + 12, ship_y + 24 + size)</text>
+    <text class="note" x="80" y="910">crossing y &gt; 128 − size − 1 → UART1SendProjectile</text>
+    <text class="note" x="80" y="928">leaving through a side first → dropped, never sent</text>
+    <text class="note" x="80" y="946">example: scale 3 → size 6, vy = 22; tilt vx = 4</text>
+
+    <text class="note" x="664" y="892">rises from (128 − x, 128 − size)</text>
+    <text class="note" x="664" y="910">overlaps the 24×24 ship → "QUIT" back</text>
+    <text class="note" x="664" y="928">top (y &lt; size + 1) or a side → dropped</text>
+    <text class="note" x="664" y="946">drawn in the shooter's colour (BLUE)</text>
+  </g>
+
+  <!-- ============ (c) ONE PLAYFIELD ============ -->
+  <g>
+    <rect class="group" x="24" y="984" width="952" height="380" rx="12"/>
+    <text class="glbl" x="40" y="1008">ONE PLAYFIELD — THE SAME SHOT, WITH A'S SCREEN TURNED 180°</text>
+
+    <!-- world px: X = 96 + 1.25x, Y = 1028 + 1.25y; A occupies world y 128..256 -->
+    <rect class="b-gray" x="96" y="1028" width="160" height="160" rx="3"/>
+    <rect class="b-gray" x="96" y="1188" width="160" height="160" rx="3"/>
+    <!-- B ship (52,52) + 2 pips -->
+    <rect class="b-blue" x="161" y="1093" width="30" height="30" rx="1"/>
+    <rect class="b-blue" x="194.75" y="1118" width="5" height="5"/>
+    <rect class="b-blue" x="152.25" y="1118" width="5" height="5"/>
+    <!-- A ship: A's (52,52) is world (52..76, 180..204); pips now on top -->
+    <rect class="b-red" x="161" y="1253" width="30" height="30" rx="1"/>
+    <rect class="b-red" x="152.25" y="1253" width="5" height="5"/>
+    <rect class="b-red" x="194.75" y="1253" width="5" height="5"/>
+    <rect class="b-red" x="152.25" y="1261.75" width="5" height="5"/>
+    <rect class="b-red" x="194.75" y="1261.75" width="5" height="5"/>
+    <rect class="b-red" x="152.25" y="1270.5" width="5" height="5"/>
+    <rect class="b-red" x="194.75" y="1270.5" width="5" height="5"/>
+    <!-- path through world (64,82) (68,104) (72,126) | (72,134) (76,156) -> hit (80,178) -->
+    <path class="edge-dash" d="M176,1130.5 L181,1158 L186,1185.5 L186,1195.5 L191,1223 L194.7,1243.1" marker-end="url(#ah)"/>
+    <circle class="b-blue" cx="181" cy="1158" r="7.5"/>
+    <circle class="b-blue" cx="191" cy="1223" r="7.5"/>
+    <circle class="b-planned" cx="196" cy="1250.5" r="7.5"/>
+    <rect class="wire" x="96" y="1028" width="160" height="160" rx="3"/>
+    <rect class="wire" x="96" y="1188" width="160" height="160" rx="3"/>
+
+    <!-- labels beside the panels -->
+    <text class="note" x="276" y="1040">B's top edge (y = 0)</text>
+    <text class="lbl" x="276" y="1104">board B</text>
+    <text class="note" x="276" y="1122">upright</text>
+    <text class="note" x="276" y="1192">both bottom edges (y = 128)</text>
+    <text class="lbl" x="276" y="1262">board A</text>
+    <text class="note" x="276" y="1280">turned 180°</text>
+    <text class="note" x="276" y="1346">A's top edge (y = 0)</text>
+
+    <!-- explanation -->
+    <text class="lbl" x="500" y="1090">Read together, the four formulas are a 180° turn</text>
+    <text class="note" x="500" y="1116">Turn A's screen 180° about the middle of the shared bottom edge</text>
+    <text class="note" x="500" y="1134">and B's point (x, y) lands at (128 − x, 256 − y) in A's coordinates,</text>
+    <text class="note" x="500" y="1152">while (vx, vy) becomes (−vx, −vy): x', vx' and vy' are exactly that.</text>
+    <text class="note" x="500" y="1178">Only y' is not carried over. It is reset to 128 − size, so the shot</text>
+    <text class="note" x="500" y="1196">re-enters flush with A's bottom edge (here 122 instead of 130,</text>
+    <text class="note" x="500" y="1214">which would be just off-screen): a small hop at the seam.</text>
+    <text class="note" x="500" y="1240">Laid bottom edge to bottom edge, one board turned around, the two</text>
+    <text class="note" x="500" y="1258">panels read as one 128 × 256 playfield: B's down-right is A's up-left.</text>
+  </g>
+</svg>

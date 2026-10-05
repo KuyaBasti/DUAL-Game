@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 628" width="1000" height="628" role="img" aria-label="DUAL system overview: two CC3200 boards, each with an accelerometer, SW3 fire button, IR receiver and SSD1351 OLED, linked over UART1 and posting usernames and scores over TLS to an AWS IoT device shadow that an AWS IoT Rule relays to a Flask scoreboard">
+  <style>
+    .bg{fill:#ffffff}
+    .title{fill:#1f2328;font:600 22px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .sub{fill:#59636e;font:14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .lbl{fill:#1f2328;font:600 14px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .note{fill:#59636e;font:12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .glbl{fill:#59636e;font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;letter-spacing:.06em}
+    .elbl{fill:#59636e;font:11px -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+    .edge{stroke:#818b98;stroke-width:1.6;fill:none}
+    .edge-dash{stroke:#818b98;stroke-width:1.6;fill:none;stroke-dasharray:6 4}
+    .arrow{fill:#818b98}
+    .group{fill:none;stroke:#d1d9e0;stroke-width:1.2;stroke-dasharray:4 4}
+    .b-blue{fill:#ddf4ff;stroke:#54aeff;stroke-width:1.5}
+    .b-green{fill:#dafbe1;stroke:#4ac26b;stroke-width:1.5}
+    .b-purple{fill:#fbefff;stroke:#c297ff;stroke-width:1.5}
+    .b-orange{fill:#fff1e5;stroke:#fb8f44;stroke-width:1.5}
+    .b-gray{fill:#f6f8fa;stroke:#d1d9e0;stroke-width:1.5}
+    @media (prefers-color-scheme: dark){
+      .bg{fill:#0d1117}
+      .title,.lbl{fill:#e6edf3}
+      .sub,.note,.glbl,.elbl{fill:#9198a1}
+      .edge,.edge-dash{stroke:#9198a1}
+      .arrow{fill:#9198a1}
+      .group{stroke:#3d444d}
+      .b-blue{fill:#0c2d6b;stroke:#4493f8}
+      .b-green{fill:#0f3b1e;stroke:#3fb950}
+      .b-purple{fill:#2e1a4f;stroke:#ab7df8}
+      .b-orange{fill:#3d1f0a;stroke:#f0883e}
+      .b-gray{fill:#151b23;stroke:#3d444d}
+    }
+  </style>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="arrow" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="1000" height="628" rx="12"/>
+  <text class="title" x="32" y="48">DUAL — system overview</text>
+  <text class="sub" x="32" y="74">Each CC3200 simulates its own half of the playfield; only events cross UART1, and scores go to AWS.</text>
+
+  <!-- ===== Board A ===== -->
+  <rect class="group" x="24" y="96" width="404" height="304" rx="12"/>
+  <text class="glbl" x="40" y="118">BOARD A · CC3200 LAUNCHPAD · RED</text>
+
+  <rect class="b-orange" x="44" y="132" width="160" height="56" rx="10"/>
+  <text class="lbl" x="124" y="156" text-anchor="middle">Accelerometer</text>
+  <text class="note" x="124" y="175" text-anchor="middle">tilt steers the ship</text>
+
+  <rect class="b-orange" x="44" y="198" width="160" height="56" rx="10"/>
+  <text class="lbl" x="124" y="222" text-anchor="middle">SW3 button</text>
+  <text class="note" x="124" y="241" text-anchor="middle">charge + fire shots</text>
+
+  <rect class="b-orange" x="44" y="264" width="160" height="56" rx="10"/>
+  <text class="lbl" x="124" y="288" text-anchor="middle">IR receiver</text>
+  <text class="note" x="124" y="307" text-anchor="middle">TV-remote keypad</text>
+
+  <rect class="b-orange" x="44" y="330" width="160" height="56" rx="10"/>
+  <text class="lbl" x="124" y="354" text-anchor="middle">SSD1351 OLED</text>
+  <text class="note" x="124" y="373" text-anchor="middle">128×128 RGB565</text>
+
+  <rect class="b-blue" x="290" y="225" width="126" height="68" rx="10"/>
+  <text class="lbl" x="353" y="255" text-anchor="middle">CC3200 MCU</text>
+  <text class="note" x="353" y="275" text-anchor="middle">main.c game loop</text>
+
+  <path class="edge" d="M204,160 H330 V221" marker-end="url(#ah)"/>
+  <text class="elbl" x="262" y="152" text-anchor="middle">I2C 400 kHz</text>
+  <path class="edge" d="M204,240 H286" marker-end="url(#ah)"/>
+  <path class="edge" d="M204,278 H286" marker-end="url(#ah)"/>
+  <text class="elbl" x="245" y="263" text-anchor="middle">GPIO ISRs</text>
+  <path class="edge" d="M330,293 V358 H208" marker-end="url(#ah)"/>
+  <text class="elbl" x="262" y="350" text-anchor="middle">SPI 100 kHz</text>
+
+  <!-- ===== Board B (mirror) ===== -->
+  <rect class="group" x="572" y="96" width="404" height="304" rx="12"/>
+  <text class="glbl" x="588" y="118">BOARD B · CC3200 LAUNCHPAD · BLUE</text>
+
+  <rect class="b-orange" x="796" y="132" width="160" height="56" rx="10"/>
+  <text class="lbl" x="876" y="156" text-anchor="middle">Accelerometer</text>
+  <text class="note" x="876" y="175" text-anchor="middle">tilt steers the ship</text>
+
+  <rect class="b-orange" x="796" y="198" width="160" height="56" rx="10"/>
+  <text class="lbl" x="876" y="222" text-anchor="middle">SW3 button</text>
+  <text class="note" x="876" y="241" text-anchor="middle">charge + fire shots</text>
+
+  <rect class="b-orange" x="796" y="264" width="160" height="56" rx="10"/>
+  <text class="lbl" x="876" y="288" text-anchor="middle">IR receiver</text>
+  <text class="note" x="876" y="307" text-anchor="middle">TV-remote keypad</text>
+
+  <rect class="b-orange" x="796" y="330" width="160" height="56" rx="10"/>
+  <text class="lbl" x="876" y="354" text-anchor="middle">SSD1351 OLED</text>
+  <text class="note" x="876" y="373" text-anchor="middle">128×128 RGB565</text>
+
+  <rect class="b-blue" x="584" y="225" width="126" height="68" rx="10"/>
+  <text class="lbl" x="647" y="255" text-anchor="middle">CC3200 MCU</text>
+  <text class="note" x="647" y="275" text-anchor="middle">main.c game loop</text>
+
+  <path class="edge" d="M796,160 H670 V221" marker-end="url(#ah)"/>
+  <text class="elbl" x="738" y="152" text-anchor="middle">I2C 400 kHz</text>
+  <path class="edge" d="M796,240 H714" marker-end="url(#ah)"/>
+  <path class="edge" d="M796,278 H714" marker-end="url(#ah)"/>
+  <text class="elbl" x="755" y="263" text-anchor="middle">GPIO ISRs</text>
+  <path class="edge" d="M670,293 V358 H792" marker-end="url(#ah)"/>
+  <text class="elbl" x="738" y="350" text-anchor="middle">SPI 100 kHz</text>
+
+  <!-- ===== Board-to-board link ===== -->
+  <path class="edge" d="M420,259 H580" marker-start="url(#ah)" marker-end="url(#ah)"/>
+  <text class="elbl" x="500" y="236" text-anchor="middle">UART1 crossover</text>
+  <text class="elbl" x="500" y="250" text-anchor="middle">115200 8N1</text>
+  <text class="elbl" x="500" y="276" text-anchor="middle">11-byte shots</text>
+  <text class="elbl" x="500" y="290" text-anchor="middle">READY · QUIT · r/h</text>
+
+  <!-- ===== Cloud path ===== -->
+  <path class="edge" d="M380,293 V426" marker-end="url(#ah)"/>
+  <path class="edge" d="M620,293 V426" marker-end="url(#ah)"/>
+  <text class="elbl" x="500" y="418" text-anchor="middle">username + scores · POST over TLS</text>
+
+  <rect class="b-purple" x="360" y="430" width="280" height="64" rx="10"/>
+  <text class="lbl" x="500" y="458" text-anchor="middle">AWS IoT device shadow</text>
+  <text class="note" x="500" y="478" text-anchor="middle">/things/FinalThing/shadow</text>
+
+  <path class="edge-dash" d="M500,494 V540" marker-end="url(#ah)"/>
+  <text class="elbl" x="512" y="521">AWS IoT Rule, HTTP action (not in this repo)</text>
+
+  <rect class="b-green" x="380" y="544" width="240" height="60" rx="10"/>
+  <text class="lbl" x="500" y="570" text-anchor="middle">Flask scoreboard</text>
+  <text class="note" x="500" y="590" text-anchor="middle">server.py · port 5000</text>
+</svg>

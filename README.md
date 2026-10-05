@@ -1,5 +1,7 @@
 # DUAL — a two-board CC3200 arcade shooter
 
+<p align="center"><img src="docs/system-overview.svg" alt="DUAL system overview: two CC3200 LaunchPads, each with an accelerometer, SW3 fire button, IR receiver and SSD1351 OLED, linked over UART1 and posting usernames and scores over TLS to an AWS IoT device shadow, which an AWS IoT Rule relays to a Flask scoreboard" width="100%"></p>
+
 A real-time two-player game inspired by the mobile game *DUAL*, built on **two TI CC3200 LaunchPads**, each driving its own **Adafruit SSD1351 128×128 OLED** over SPI. You steer your ship by **tilting the board** (the LaunchPad's on-board accelerometer, read over I2C), charge and fire shots with **SW3**, and your projectiles fly off the bottom of your screen and **onto your opponent's screen** through an 11-byte packet on a **UART crossover cable**. Usernames are typed with a **TV-remote multi-tap keypad**, decoded from raw IR pulse widths in a GPIO interrupt handler. Every round result is POSTed over TLS to an **AWS IoT device shadow**, and a small **Flask server** ([server.py](server.py)) keeps a live two-player scoreboard fed from the cloud.
 
 The interesting part isn't any single peripheral — it's that **there is no shared game state**. Each board simulates only its own half of the world: its ship, its shots, its ammo. The moment a projectile leaves the bottom edge, it is serialized, sent, and *reconstructed* on the peer with mirrored coordinates and negated velocities — the two screens behave like one continuous playfield folded in half. Synchronization is purely event-based: a `READY` handshake to start, a `QUIT` message when a ship is hit, a one-byte `r`/`h` vote on the rematch screen. No clocks are exchanged, ever.
@@ -27,26 +29,7 @@ Demo & writeup: **[project webpage](https://dihan922.github.io/dual-webpage/)** 
 
 ## How a Round Works
 
-```mermaid
-flowchart TD
-    BOOT["boot — pin mux, UART1 115200,<br/>SysTick + TimerA0 at 40 ms, I2C fast mode,<br/>SPI 100 kHz + OLED init, Wi-Fi + TLS to AWS"] --> NAME["username screen —<br/>multi-tap entry via IR remote"]
-    NAME --> READY["swap 'READY' over UART1<br/>+ POST username to AWS IoT"]
-    READY --> LOOP["round loop — free-running"]
-    LOOP --> RX{"bytes on UART1?"}
-    RX -- "11-byte packet" --> MIRROR["reconstruct incoming shot:<br/>x = 128 − x, negate velocities"]
-    RX -- "'QUIT'" --> WINR["my_score++ — round won,<br/>POST score"]
-    LOOP --> TILT["read accel regs 0x03/0x05 —<br/>velocity += tilt × 13/64, × 0.99 friction"]
-    TILT --> FIRE{"SW3 released?"}
-    FIRE -- "yes, ammo or charge" --> SHOOT["spawn shot — size 2×charge,<br/>vy 10 + 4×charge, vx = tilt"]
-    SHOOT --> OFF{"shot exits<br/>bottom edge?"}
-    OFF -- "yes" --> SEND["UART1SendProjectile —<br/>11 bytes to the peer"]
-    MIRROR --> HIT{"incoming shot<br/>overlaps my ship?"}
-    HIT -- "yes" --> LOSE["send 'QUIT' — opponent_score++,<br/>POST score"]
-    WINR --> FIVE{"either score ≥ 5?"}
-    LOSE --> FIVE
-    FIVE -- "no" --> LOOP
-    FIVE -- "yes" --> END["WIN/LOSE screen — IR remote<br/>picks rematch or home,<br/>'r'/'h' handshake over UART1"]
-```
+<p align="center"><img src="docs/how-a-round-works.svg" alt="How a round works on one board: READY swap, the round loop with tilt, fire, send and receive, scoring, and the WIN/LOSE rematch or home vote" width="100%"></p>
 
 One board's projectile becomes the other board's incoming projectile: the sender only ever simulates shots moving *down* its own screen, and the receiver only ever simulates them moving *up* — the mirroring in `UART1ReceiveProjectile` is what folds the two screens into one playfield.
 
@@ -77,8 +60,13 @@ Crossover wiring between the boards: board A TX → board B RX, board A RX → b
 dual-main/
 ├── README.md               # you are here
 ├── SYSTEM-DESIGN.md        # the architecture-level view
-├── docs/
-│   └── wiring-diagram.svg  # the two-board schematic above
+├── docs/                   # SVG diagrams (light and dark aware)
+│   ├── system-overview.svg         # README: overview at the top
+│   ├── how-a-round-works.svg       # README: how a round works
+│   ├── wiring-diagram.svg          # README: the two-board schematic
+│   ├── system-design-flowchart.svg # SYSTEM-DESIGN: end-to-end flowchart
+│   ├── system-design-round.svg     # SYSTEM-DESIGN: deep dive 1, one round
+│   └── packet-and-fold.svg         # SYSTEM-DESIGN: deep dive 2, packet + fold
 ├── main.c                  # the whole game: ISRs, game loop, UART link protocol,
 │                           #   IR decoding, multi-tap keypad, AWS shadow POSTs
 ├── pin_mux_config.c/.h     # TI PinMux-generated pin assignments
@@ -88,7 +76,7 @@ dual-main/
 ├── Adafruit_GFX.c/.h       # Adafruit GFX primitives ported from C++ to C
 ├── glcdfont.h              # classic 5×7 ASCII font table
 ├── i2c_if.c                # TI SDK polled I2C master helpers (vendored copy)
-├── server.py               # Flask scoreboard receiver (AWS Lambda posts here)
+├── server.py               # Flask scoreboard receiver (AWS IoT Rule HTTP action posts here)
 ├── cc3200v1p32.cmd         # TI linker script for the CC3200
 ├── .project / .cproject    # CCS project — links uart_if.c / gpio_if.c /
 │                           #   startup_ccs.c from the CC3200 SDK by path
@@ -143,7 +131,7 @@ Before each game you type a username with a TV remote (an AT&T S10-S3 in the ori
 
 `InitUART1` configures UARTA1 at **115200 8N1** with FIFOs on. The protocol is three message kinds, all raw bytes with no framing:
 
-- **`READY`** (5 bytes) — sent after username entry; each board blocks until it has read the peer's `READY` before the game starts.
+- **`READY`** (5 bytes) — sent after username entry; each board then blocks until any 5 bytes arrive from the peer. The content only matters after a *home* vote: an exact `READY` sets `game_running` again (on first boot it's already set).
 - **Projectile packet** (11 bytes) — `x_position` (2 bytes), `x_velocity` (4), `y_velocity` (4), `size` (1). The y position is *implied*: the receiver spawns the shot at `y = 128 − size` (its bottom edge), mirrors `x = 128 − x`, and negates both velocities, so a shot that left the sender's screen moving down-right enters the receiver's screen moving up-left.
 - **`QUIT`** (4 bytes) — sent by the board whose ship was hit; both sides end the round, bump the right score, and POST it to AWS. First to **5** round wins takes the game; then a one-byte `r` (rematch) / `h` (home) vote is exchanged.
 
@@ -151,7 +139,7 @@ Before each game you type a username with a TV remote (an AT&T S10-S3 in the ori
 
 Score updates leave the board as hand-built HTTPS over a raw TLS socket (SimpleLink): `http_post` assembles a `POST /things/FinalThing/shadow` request against the AWS IoT endpoint `ahvzuro29rftq-ats.iot.us-west-2.amazonaws.com` (connected by hardcoded IP `52.88.252.80:8443`), with the message wrapped in the device-shadow envelope `{"state": {"desired": {"default": …}}}`. The board POSTs on username entry, game start, every round end, and every rematch.
 
-[server.py](server.py) is the other end of the pipeline: a Flask app on port 5000 whose `POST /` expects `{"iotMessage": {…}}` — the shape produced by an AWS Lambda that subscribes to the shadow updates and relays them (the Lambda itself is not in this repo; in the original deployment the Flask server was exposed to it via ngrok — see the webpage). A username-only message registers a player (two slots, kept in alphabetical order; a third distinct name replaces the slot an alternating `last_replaced` toggle points at — in practice the more recently registered player, and the toggle isn't updated when the alphabetical swap reorders the slots — and zeroes that slot's score); a message with `my_score`/`opponent_score` updates both scores keyed by sender. `GET /get_status` returns the live `{player1, player2, score1, score2}` JSON.
+[server.py](server.py) is the other end of the pipeline: a Flask app on port 5000 whose `POST /` expects `{"iotMessage": {…}}` — the shape produced by an AWS IoT Rule with an HTTP action that fires on the shadow updates and relays them (the rule itself is not in this repo; in the original deployment the Flask server was exposed to it via ngrok — see the webpage). A username-only message registers a player (two slots, kept in alphabetical order; a third distinct name replaces the slot an alternating `last_replaced` toggle points at — in practice the more recently registered player, and the toggle isn't updated when the alphabetical swap reorders the slots — and zeroes that slot's score); a message with `my_score`/`opponent_score` updates both scores keyed by sender. `GET /get_status` returns the live `{player1, player2, score1, score2}` JSON.
 
 ## Build & Flash
 
@@ -161,8 +149,8 @@ This is a Code Composer Studio project for real hardware — you need **two CC32
 2. Set your Wi-Fi credentials in the course `network_utils` and, if you want the cloud path, your own AWS IoT endpoint/thing in the `#define` block at the top of [main.c](main.c) — the committed endpoint belongs to the original deployment.
 3. Build and flash **board 1 with `PLAYER_MODE 1`** and **board 2 with `PLAYER_MODE 0`** (one macro at the top of [main.c](main.c)).
 4. Wire everything per the [diagram](docs/wiring-diagram.svg): OLED + IR receiver on each board, UART1 crossover between them, grounds tied.
-5. Run the scoreboard: `python3 server.py` (Flask, port 5000), with the Lambda relay pointed at it.
-6. Reset both boards; each shows the username screen, and the game starts when both have sent `READY`.
+5. Run the scoreboard: `python3 server.py` (Flask, port 5000), with the AWS IoT Rule's HTTP action pointed at it.
+6. Reset both boards; each shows the username screen, sends `READY` once its name is entered, and starts the game as soon as 5 bytes arrive from the peer, so play begins once both names are in.
 
 Debugging goes through the on-board Stellaris ICDI ([targetConfigs/CC3200.ccxml](targetConfigs/CC3200.ccxml)); `Report(...)` printf lands on the UART0 USB console.
 
@@ -170,7 +158,7 @@ Debugging goes through the on-board Stellaris ICDI ([targetConfigs/CC3200.ccxml]
 
 Honest notes — all verified in the code, several inherited from lab scaffolding:
 
-- **`jsonify` can smash the stack.** It does `snprintf(output, 256, …)` but every caller hands it a `char jsonmsg[100]`. A long username plus the shadow envelope pushes the output past 100 bytes — undefined behavior on a 100-byte stack buffer.
+- **`jsonify` smashes the stack.** It does `snprintf(output, 256, …)` but every caller hands it a `char jsonmsg[100]`, and the shadow envelope alone is 49 bytes. Every round-end score POST overflows `jsonmsg[100]` (≥ 105 bytes even with a 1-character username), and the username-only POSTs overflow from a 33-character username — undefined behavior on a 100-byte stack buffer.
 - **The OLED reset pulse goes to the wrong pin.** `Adafruit_Init` toggles `GPIOA2` bit `0x2` — that's GPIO17 / PIN_08, which this project muxes as **UART1 RX**. PIN_62 is dutifully configured as the reset output in [pin_mux_config.c](pin_mux_config.c) but is never written. The panel works because it power-on-resets itself.
 - **`ReadAccData` can return the integer −1 as a pointer.** `RET_IF_ERR` returns `FAILURE` (−1) from a function whose return type is `int8_t*`; on an I2C error the caller would dereference `0xFFFFFFFF`. (It also declares a 256-byte read buffer to hold 4 bytes.)
 - **The UART protocol has no framing.** Eleven positional bytes, no start byte, length, or checksum — one dropped byte desyncs the link, and the blocking `while (index < 11)` read spins forever if the peer stalls. The `QUIT` check runs *inside* the byte loop against a partially filled buffer, so a projectile packet whose first four bytes happen to spell `QUIT` would falsely end the round. (Start-byte + checksum framing would be the obvious hardening.)
@@ -178,7 +166,7 @@ Honest notes — all verified in the code, several inherited from lab scaffoldin
 - **The cloud identity is hardcoded** — AWS endpoint IP, hostname, and thing name (`FinalThing`) all live in `#define`s, and the Wi-Fi credentials live in the course-provided `network_utils` that is **not committed**. The repo does not build stand-alone: `simplelink.h` and `utils/network_utils.h` must come from the course SDK setup.
 - **`Debug/` is a stale snapshot.** The binary shipped alongside the sources (Mar 2025 — git-ignored, never committed) links an `oled_test.obj` whose source isn't in the repo and contains **no SimpleLink code at all** — it predates the AWS integration. Don't flash it expecting the cloud path.
 - **Leftover duplication** — `APPLICATION_VERSION`, `APP_NAME`, `CONSOLE`, and `SPI_IF_BIT_RATE` are each `#define`d twice (a remnant "SSL + IR Decoding" lab block above the "DUAL" block); `http_post`/`jsonify` are called above their definitions (implicit-declaration warnings); PIN_58 is set to `PIN_MODE_0` in the "unused pins" list and then re-muxed as UART1 TX; and the SSD1351 init sends several parameters via `writeCommand` where the datasheet wants data bytes (inherited from the scaffolding port — the panel tolerates it).
-- **Everything blocks.** The round loop free-runs with no frame timing (game speed is effectively SPI-throughput-bound), the `READY`/ack handshakes spin forever, and `ammo`/`charge` state is shared between ISRs and the loop as `volatile` globals with no atomicity guarantees.
+- **Everything blocks.** The round loop free-runs with no frame timing (game speed is effectively SPI-throughput-bound), the `READY` wait (any 5 bytes) and the one-byte `r`/`h` vote read spin forever, and `ammo`/`charge` state is shared between ISRs and the loop as `volatile` globals with no atomicity guarantees.
 
 ## Provenance & Acknowledgments
 
